@@ -5,6 +5,7 @@ import de.jugda.registration.model.Registration;
 import de.jugda.registration.service.EmailService;
 import de.jugda.registration.service.EventService;
 import de.jugda.registration.service.ListService;
+import de.jugda.registration.service.RegistrationService;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
@@ -43,6 +44,8 @@ public class AdminResource {
     Template overview;
     @Location("admin/list")
     Template list;
+    @Inject
+    RegistrationService registrationService;
 
     @GET
     public TemplateInstance getAllEvents() {
@@ -105,5 +108,35 @@ public class AdminResource {
 
         return Response.noContent().build();
     }
+
+    @PUT
+    @Path("{eventId}/messageToAll")
+    public Response sendMessageToAll(@PathParam("eventId") String eventId) {
+        String templateName = "custom";
+        String subject = "Link zum Online-Vortrag der {{tenant.name}} heute Abend";
+        String message = """
+Hallo {{name}}!
+
+Du hast Dich für unseren heutigen Online-Vortrag angemeldet. Den Link zur Einwahl und weitere Informationen findest Du hier:
+
+{{tenant.baseUrl}}/webinar/{{eventId}}
+
+Bis heute Abend, wir freuen uns auf Dein Kommen. Im Anschluss an den Vortrag kannst Du übrigens gern noch bei unserem virtuellen Stammtisch mitplaudern oder einfach nur zuhören.
+
+Viele Grüße
+Dein {{tenant.name}} Orga-Team""";
+
+
+        AtomicInteger index = new AtomicInteger(0);
+        Collection<List<Registration>> chunkedRegistrations = listService.singleEventRegistrations(eventId).stream()
+            .collect(Collectors.groupingBy(x -> index.getAndIncrement() / 50)).values();
+
+        if (!chunkedRegistrations.isEmpty()) {
+            emailService.sendBulkEmail(chunkedRegistrations, templateName, subject, message);
+        }
+
+        return Response.noContent().build();
+    }
+
 
 }
