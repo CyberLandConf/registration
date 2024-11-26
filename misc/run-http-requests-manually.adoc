@@ -11,9 +11,10 @@ include::registration-requests.http[]
 <4> Send e-mail message to participants
 <5> Show overview of events
 <6> Event administration UI (send mail, upload Webinar data)
-<7> Show Webinar data
-<8> Delete registration by unique key (_Caution_: This request is incomplete, you need to add the unique id you received on registration)
-<9> Delete registration of participant by eventId and e-mail address
-<10> Delete registration by eventId and unique key (_Caution_: This request is incomplete, you need to add the unique id you received on registration)
+<7> Optional: Event administration REST (send mail, upload Webinar data)
+<8> Show Webinar data
+<9> Delete registration by unique key (_Caution_: This request is incomplete, you need to add the unique id you received on registration)
+<10> Delete registration of participant by eventId and e-mail address
+<11> Delete registration by eventId and unique key (_Caution_: This request is incomplete, you need to add the unique id you received on registration)
 
 NOTE: Find/change the variables in link:http-client.env.json[].
