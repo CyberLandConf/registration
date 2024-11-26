@@ -22,21 +22,25 @@ Content-Type: application/json
 ### Show overview of events <5>
 GET {{baseurl}}/admin/events
 
-### Show registrations of one event <6>
+
+### Show registrations of one event as HTML<6>
+GET {{baseurl}}/admin/events/{{eventId}}
+
+### Show registrations of one event as JSON<7>
 GET {{baseurl}}/admin/events/{{eventId}}
 Accept: application/json
 
-### Show Webinar data <7>
+### Show Webinar data <8>
 GET {{baseurl}}/webinar/{{eventId}}
 
-### Delete my registration - You need to append the registration UUID received in #<2> <8>
+### Delete my registration - You need to append the registration UUID received in #<2> <9>
 DELETE {{baseurl}}/delete?id=3053214b-39fb-448a-8dbb-eb148c984a99
 
-### Delete my registration by date and mail address <9>
+### Delete my registration by date and mail address <10>
 POST {{baseurl}}/delete
 Content-Type: application/x-www-form-urlencoded
 
 eventId={{eventId}}&email=gerd@aschemann.net
 
-### Delete my registration - You need to append the event id and the registration UUID received in #<2> <10>
+### Delete my registration - You need to append the event id and the registration UUID received in #<2> <11>
 GET {{baseurl}}/delete?eventId={{eventId}}&id=e6c05d25-0c3e-4974-810c-62c408d88d09
