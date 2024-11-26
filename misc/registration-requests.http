@@ -24,6 +24,7 @@ GET {{baseurl}}/admin/events
 
 ### Show registrations of one event <6>
 GET {{baseurl}}/admin/events/{{eventId}}
+Accept: application/json
 
 ### Show Webinar data <7>
 GET {{baseurl}}/webinar/{{eventId}}

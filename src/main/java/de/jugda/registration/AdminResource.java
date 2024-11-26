@@ -65,6 +65,13 @@ public class AdminResource {
             .data("registrations", registrations);
     }
 
+    @GET
+    @Path("{eventId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Registration> getRegistrationList(@PathParam("eventId") String eventId) {
+        return listService.singleEventRegistrations(eventId);
+    }
+
     @PUT
     @Path("{eventId}/data")
     @Consumes(MediaType.APPLICATION_JSON)
