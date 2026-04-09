@@ -15,7 +15,6 @@ import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * @author Niko Köbler, https://www.n-k.de, @dasniko
