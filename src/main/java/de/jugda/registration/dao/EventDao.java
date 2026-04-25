@@ -1,6 +1,7 @@
 package de.jugda.registration.dao;
 
 import de.jugda.registration.domain.Event;
+import de.jugda.registration.model.EventDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -45,5 +46,9 @@ public class EventDao {
              return null;
          }
          return resultList.get(0);
+     }
+
+     public Event getEventById(String uid){
+         return em.find(Event.class, uid);
      }
 }
