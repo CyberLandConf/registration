@@ -3,7 +3,8 @@ package de.jugda.registration.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.jugda.registration.Config;
-import de.jugda.registration.model.Event;
+import de.jugda.registration.dao.EventDao;
+import de.jugda.registration.model.EventDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.SneakyThrows;
@@ -30,18 +31,18 @@ public class EventService {
     @Inject
     Config config;
 
-    private List<Event> allEvents;
+    private List<EventDto> allEvents;
     private Map<String, Map<String, String>> eventData;
 
     @SneakyThrows
-    public List<Event> getAllEvents() {
+    public List<EventDto> getAllEvents() {
         if (allEvents == null) {
             allEvents = objectMapper.readValue(new URL(config.events().jsonUrl()), new TypeReference<>() {});
         }
         return allEvents;
     }
 
-    public Event getEvent(String eventId) {
+    public EventDto getEvent(String eventId) {
         return getAllEvents().stream()
             .filter(event -> event.uid.startsWith(eventId.replaceAll("-", "")))
             .findFirst()

@@ -2,7 +2,7 @@ package de.jugda.registration.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.jugda.registration.Config;
-import de.jugda.registration.model.Event;
+import de.jugda.registration.model.EventDto;
 import de.jugda.registration.model.Registration;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
@@ -12,11 +12,9 @@ import io.quarkus.qute.Template;
 import io.quarkus.runtime.LaunchMode;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import lombok.SneakyThrows;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * @author Niko Köbler, https://www.n-k.de, @dasniko
@@ -40,7 +38,7 @@ public class EmailService {
     LaunchMode launchMode;
 
     void sendRegistrationConfirmation(Registration registration) {
-        Event event = eventService.getEvent(registration.eventId);
+        EventDto event = eventService.getEvent(registration.eventId);
         String subject = String.format("[%s] Anmeldebestätigung für \"%s\" am %s",
             config.email().subjectPrefix(), event.summary, event.startDate());
 
@@ -54,7 +52,7 @@ public class EmailService {
     }
 
     void sendWaitlistToAttendeeConfirmation(Registration registration) {
-        Event event = eventService.getEvent(registration.eventId);
+        EventDto event = eventService.getEvent(registration.eventId);
         String subject = String.format("[%s] Dein Wartelisten-Eintrag für \"%s\" am %s",
             config.email().subjectPrefix(), event.summary, event.startDate());
 

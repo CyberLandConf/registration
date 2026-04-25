@@ -2,7 +2,7 @@ package de.jugda.registration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import de.jugda.registration.model.Event;
+import de.jugda.registration.model.EventDto;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +71,7 @@ public class LocalstackResource implements QuarkusTestResourceLifecycleManager {
     @SneakyThrows
     private void createTestEvents() {
         LocalDateTime ldt = LocalDateTime.now();
-        Event event = new Event();
+        EventDto event = new EventDto();
         event.setUid(ldt.format(DateTimeFormatter.BASIC_ISO_DATE) + "@jug-da.de");
         event.setSummary("Testtalk (John Doe)");
         event.setTitle("Testtalk");
@@ -81,7 +81,7 @@ public class LocalstackResource implements QuarkusTestResourceLifecycleManager {
         event.setStart(ldt);
         event.setEnd(ldt.plusHours(2));
         event.setTimezone("Europe/Berlin");
-        List<Event> events = List.of(event);
+        List<EventDto> events = List.of(event);
 
         Writer w = new FileWriter("target/events.json");
         ObjectMapper objectMapper = new ObjectMapper();

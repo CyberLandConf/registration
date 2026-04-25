@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 @TemplateData
 @RegisterForReflection
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Event {
+public class EventDto {
     public String uid;
     public String summary;
     public String title;

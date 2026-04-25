@@ -7,7 +7,7 @@ import biweekly.io.TimezoneAssignment;
 import biweekly.property.Classification;
 import biweekly.property.Organizer;
 import biweekly.property.Status;
-import de.jugda.registration.model.Event;
+import de.jugda.registration.model.EventDto;
 import de.jugda.registration.service.EventService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -35,7 +35,7 @@ public class CalendarResource {
     @Path("{eventId}")
     @Produces("text/calendar")
     public Response getICalEntry(@PathParam("eventId") String eventId) {
-        Event event = eventService.getEvent(eventId);
+        EventDto event = eventService.getEvent(eventId);
 
         ICalendar ical = new ICalendar();
         TimezoneAssignment tz = TimezoneAssignment.download(TimeZone.getTimeZone(event.getTimezone()), false);
