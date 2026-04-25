@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 public class Event {

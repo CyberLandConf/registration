@@ -3,6 +3,7 @@ package de.jugda.registration.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.jugda.registration.dao.EventDao;
 import de.jugda.registration.domain.Event;
+import de.jugda.registration.dao.EventDao;
 import de.jugda.registration.model.EventDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
