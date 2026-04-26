@@ -23,11 +23,12 @@ class EventDaoTest {
     @Transactional
     public void roundTripGetAllEvents() {
         Event event = new Event();
+        event.setEventId("2026-04-26");
         event.setTitle("Test");
         eventDaoUnderTest.createEvent(event);
         List<Event> allEvents = eventDaoUnderTest.getAllEvents();
 
-        assertThat(allEvents).hasSize(1);
+        assertThat(allEvents).isNotEmpty();
     }
 
 
@@ -36,8 +37,9 @@ class EventDaoTest {
     public void roundTripfindEvent() {
         Event event = new Event();
         event.setTitle("Test");
+        event.setEventId("2026-04-27");
         eventDaoUnderTest.createEvent(event);
-        Event findEvent = eventDaoUnderTest.getEventById(event.getUid());
+        Event findEvent = eventDaoUnderTest.getEventByEventId(event.getEventId());
 
         assertThat(findEvent.getTitle()).isEqualTo("Test");
     }

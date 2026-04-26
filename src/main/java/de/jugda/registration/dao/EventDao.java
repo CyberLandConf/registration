@@ -1,7 +1,6 @@
 package de.jugda.registration.dao;
 
 import de.jugda.registration.domain.Event;
-import de.jugda.registration.model.EventDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -18,6 +17,7 @@ public class EventDao {
      @Inject
      private EntityManager em;
 
+     @Transactional
      public void createEvent(Event event){
          em.persist(event);
      }
@@ -32,7 +32,14 @@ public class EventDao {
          return em.createQuery(cq).getResultList();
      }
 
-     public Event getEventById(String uid){
-         return em.find(Event.class, uid);
+     public Event getEventByEventId(String eventId){
+         CriteriaBuilder cb = em.getCriteriaBuilder();
+         CriteriaQuery<Event> cq = cb.createQuery(Event.class);
+         Root<Event> root = cq.from(Event.class);
+
+         cq.select(root);
+         cq.where(cb.equal(root.get("eventId"), eventId));
+
+         return em.createQuery(cq).getResultList().get(0);
      }
 }

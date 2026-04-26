@@ -44,11 +44,10 @@ public class WebinarResource {
         }
 
         EventDto event = eventService.getEvent(eventId);
-        Map<String, String> eventData = eventService.getEventData().get(eventId);
 
         return webinar.data("event", event)
             .data("tenant", config.tenant())
-            .data("eventData", eventData)
+            .data("eventData", event)
             .data("helptext", config.page().webinar());
     }
 

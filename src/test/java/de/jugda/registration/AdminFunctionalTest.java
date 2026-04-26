@@ -20,6 +20,13 @@ public class AdminFunctionalTest extends FunctionalTestBase {
     @BeforeAll
     static void createParticipants() {
         Integer port = ConfigProvider.getConfig().getValue("quarkus.http.test-port", Integer.class);
+        given().port(port).contentType(ContentType.JSON)
+            .pathParam("eventId", EVENT_ID)
+            .body("{\"url\" : \"https://example.com/webinar\", \"summary\": \"Summary\", \"start\": \"2026-04-26T13:42:33\", \"end\":\"2026-04-26T15:48:45\"} ")
+            .put("/admin/events/{eventId}/data")
+            .then()
+            .statusCode(204);
+
         PARTICIPANTS.forEach(participant -> given().port(port).contentType(ContentType.URLENC)
             .formParams("eventId", EVENT_ID, "name", participant.getName(), "email", participant.getEmail())
             .post("/registration").then().statusCode(200));

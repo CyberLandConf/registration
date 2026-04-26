@@ -59,11 +59,10 @@ public class AdminResource {
     public TemplateInstance getEventList(@PathParam("eventId") String eventId) {
         List<Registration> registrations = listService.singleEventRegistrations(eventId);
         EventDto event = eventService.getEvent(eventId);
-        Map<String, String> eventData = eventService.getEventData().get(eventId);
 
         return list.data("eventId", eventId)
             .data("event", event)
-            .data("eventData", eventData)
+            .data("eventData", event)
             .data("tenant", config.tenant())
             .data("registrations", registrations);
     }

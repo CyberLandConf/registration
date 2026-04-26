@@ -1,5 +1,6 @@
 package de.jugda.registration.domain;
 
+import de.jugda.registration.model.EventDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -12,8 +13,9 @@ import java.util.UUID;
 public class Event {
 
     @Id
-    @GeneratedValue()
+    @GeneratedValue
     private String uid;
+    private String eventId;
     private String summary;
     private String title;
     private String description;
@@ -25,8 +27,31 @@ public class Event {
     private LocalDateTime endDate;
     private String timezone;
 
+    public static Event fromDto(EventDto eventDto) {
+        Event event = new  Event();
+        event.eventId = eventDto.getEventId();
+        event.summary = eventDto.getSummary();
+        event.title = eventDto.getTitle();
+        event.description = eventDto.getDescription();
+        event.speaker = eventDto.getSpeaker();
+        event.twitter = eventDto.getTwitter();
+        event.location = eventDto.getLocation();
+        event.url = eventDto.getUrl();
+        event.startDate = eventDto.getStart();
+        event.endDate = eventDto.getEnd();
+        return event;
+    }
+
     public String getUid() {
         return uid;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 
 
@@ -136,5 +161,20 @@ public class Event {
             ", end=" + endDate +
             ", timezone='" + timezone + '\'' +
             '}';
+    }
+
+    public EventDto toDto() {
+        EventDto eventDto = new EventDto();
+        eventDto.setEventId(uid);
+        eventDto.setSummary(summary);
+        eventDto.setTitle(title);
+        eventDto.setDescription(description);
+        eventDto.setSpeaker(speaker);
+        eventDto.setTwitter(twitter);
+        eventDto.setLocation(location);
+        eventDto.setUrl(url);
+        eventDto.setStart(startDate);
+        eventDto.setEnd(endDate);
+        return eventDto;
     }
 }
