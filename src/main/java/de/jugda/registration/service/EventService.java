@@ -19,18 +19,14 @@ public class EventService {
     @Inject
     EventDao eventDao;
 
-    @Inject
-    ObjectMapper objectMapper;
-
     public EventDto getEvent(String eventId) {
         Event event = eventDao.getEventByEventId(eventId);
         return event == null ? null : event.toDto();
     }
 
     @SneakyThrows
-    public void putEventData(String eventId, Map<String, String> data) {
-        EventDto event = objectMapper.convertValue(data, EventDto.class);
-        event.eventId = eventId;
-        eventDao.createEvent(Event.fromDto(event));
+    public void putEventData(String eventId, EventDto eventDto) {
+        eventDto.eventId = eventId;
+        eventDao.createEvent(Event.fromDto(eventDto));
     }
 }

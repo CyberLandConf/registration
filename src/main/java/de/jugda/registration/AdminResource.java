@@ -77,8 +77,8 @@ public class AdminResource {
     @PUT
     @Path("{eventId}/data")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response putEventData(@PathParam("eventId") String eventId, Map<String, String> data) {
-        eventService.putEventData(eventId, data);
+    public Response putEventData(@PathParam("eventId") String eventId, EventDto eventDto) {
+        eventService.putEventData(eventId, eventDto);
         return Response.noContent().build();
     }
 
