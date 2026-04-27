@@ -40,6 +40,10 @@ public class EventDao {
          cq.select(root);
          cq.where(cb.equal(root.get("eventId"), eventId));
 
-         return em.createQuery(cq).getResultList().get(0);
+         List<Event> resultList = em.createQuery(cq).getResultList();
+         if(resultList.isEmpty()){
+             return null;
+         }
+         return resultList.get(0);
      }
 }
