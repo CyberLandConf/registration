@@ -10,10 +10,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author Niko Köbler, http://www.n-k.de, @dasniko
@@ -34,10 +31,6 @@ public class RegistrationDto {
     public boolean remote;
     public LocalDateTime created;
     public Long ttl;
-
-    public String formattedCreationDate() {
-        return created.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-    }
 
     public static RegistrationDto of(RegistrationForm form) {
         RegistrationDto registration = new RegistrationDto();
@@ -69,24 +62,6 @@ public class RegistrationDto {
             registration.setTtl(Long.valueOf(item.get("ttl").n()));
         }
         return registration;
-    }
-
-    public Map<String, AttributeValue> toItem() {
-        Map<String, AttributeValue> item = new HashMap<>();
-        item.put("id", AttributeValue.builder().s(id == null ? UUID.randomUUID().toString() : id).build());
-        item.put("eventId", AttributeValue.builder().s(eventId).build());
-        item.put("name", AttributeValue.builder().s(name).build());
-        item.put("email", AttributeValue.builder().s(email).build());
-        item.put("pub", AttributeValue.builder().bool(pub).build());
-        item.put("waitlist", AttributeValue.builder().bool(waitlist).build());
-        item.put("privacy", AttributeValue.builder().bool(privacy).build());
-        item.put("videoRecording", AttributeValue.builder().bool(videoRecording).build());
-        item.put("remote", AttributeValue.builder().bool(remote).build());
-        item.put("created", AttributeValue.builder().s(
-            (created == null ? LocalDateTime.now() : created).format(DateTimeFormatter.ISO_DATE_TIME)
-        ).build());
-        item.put("ttl", AttributeValue.builder().n(ttl.toString()).build());
-        return item;
     }
 
     private static boolean onOrOff(String s) {

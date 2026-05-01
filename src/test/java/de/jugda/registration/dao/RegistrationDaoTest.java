@@ -5,6 +5,9 @@ import de.jugda.registration.domain.Registration;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -17,6 +20,15 @@ class RegistrationDaoTest {
 
     @Inject
     RegistrationDao registrationDaoUnderTest;
+
+    @Inject
+    EntityManager em;
+
+    @AfterEach
+    @Transactional
+    void tearDown() {
+        em.createQuery("DELETE FROM Registration e").executeUpdate();
+    }
 
     @Test
     public void roundTripFindByEventIdAndEmailRegistration() {
@@ -35,8 +47,8 @@ class RegistrationDaoTest {
     @Test
     public void roundTripFindAllRegistration() {
         Registration registration = new Registration();
-        registration.setEventId("eventId");
-        registration.setEmail("email");
+        registration.setEventId("eventId2");
+        registration.setEmail("email2");
 
         registrationDaoUnderTest.save(registration);
 
