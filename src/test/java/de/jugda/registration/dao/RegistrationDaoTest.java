@@ -85,4 +85,18 @@ class RegistrationDaoTest {
         assertThat(count).isEqualTo(1);
     }
 
+    @Test
+    public void roundtripDelete(){
+        Registration registration = new Registration();
+        registration.setEventId("eventId6");
+        registration.setEmail("email6");
+        registrationDaoUnderTest.save(registration);
+
+        registrationDaoUnderTest.delete(registration.getId());
+
+        List<Registration> foundRegistration = registrationDaoUnderTest.findByEventId(registration.getEventId());
+
+        assertThat(foundRegistration).isEmpty();
+    }
+
 }

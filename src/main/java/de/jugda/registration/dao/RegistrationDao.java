@@ -88,19 +88,10 @@ public class RegistrationDao {
         return em.createQuery(cq).getSingleResult().intValue();
     }
 
+    @Transactional
     public Registration delete(String id) {
-        Map<String, AttributeValue> key = Map.of("id", toAttribute(id));
-
-        Registration registration = Registration.from(dynamoDB.getItem(builder -> builder
-            .tableName(config.dynamodb().table())
-            .key(key)
-            .projectionExpression(attributesToGet)
-            .expressionAttributeNames(expressionAttributeNames)
-        ).item());
-        //noinspection ResultOfMethodCallIgnored
-        registration.getId(); // materialize object
-
-        dynamoDB.deleteItem(builder -> builder.tableName(config.dynamodb().table()).key(key));
+        Registration registration = em.find(Registration.class, id);
+        em.remove(registration);
 
         return registration;
     }
