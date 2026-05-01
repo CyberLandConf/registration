@@ -3,7 +3,7 @@ package de.jugda.registration.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.jugda.registration.Config;
 import de.jugda.registration.model.EventDto;
-import de.jugda.registration.model.Registration;
+import de.jugda.registration.model.RegistrationDto;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import io.quarkus.qute.Location;
@@ -37,7 +37,7 @@ public class EmailService {
     @Inject
     LaunchMode launchMode;
 
-    void sendRegistrationConfirmation(Registration registration) {
+    void sendRegistrationConfirmation(RegistrationDto registration) {
         EventDto event = eventService.getEvent(registration.eventId);
         String subject = String.format("[%s] Anmeldebestätigung für \"%s\" am %s",
             config.email().subjectPrefix(), event.summary, event.startDate());
@@ -51,7 +51,7 @@ public class EmailService {
         sendEmail(registration, subject, mailBody);
     }
 
-    void sendWaitlistToAttendeeConfirmation(Registration registration) {
+    void sendWaitlistToAttendeeConfirmation(RegistrationDto registration) {
         EventDto event = eventService.getEvent(registration.eventId);
         String subject = String.format("[%s] Dein Wartelisten-Eintrag für \"%s\" am %s",
             config.email().subjectPrefix(), event.summary, event.startDate());
@@ -65,12 +65,12 @@ public class EmailService {
         sendEmail(registration, subject, mailBody);
     }
 
-    private void sendEmail(Registration registration, String subject, String mailBody) {
+    private void sendEmail(RegistrationDto registration, String subject, String mailBody) {
         Mail mail = Mail.withHtml(registration.email, subject, mailBody);
         mailer.send(mail);
     }
 
-    public void sendBulkEmail(Collection<List<Registration>> chunkedRegistrations, String templateName, String subject, String body) {
+    public void sendBulkEmail(Collection<List<RegistrationDto>> chunkedRegistrations, String templateName, String subject, String body) {
         Qute.Fmt messageTemplate = Qute.fmt(body)
             .data("tenant", config.tenant());
 

@@ -1,7 +1,8 @@
 package de.jugda.registration.service;
 
 import de.jugda.registration.dao.RegistrationDao;
-import de.jugda.registration.model.Registration;
+import de.jugda.registration.domain.Registration;
+import de.jugda.registration.model.RegistrationDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -18,12 +19,12 @@ public class ListService {
     @Inject
     RegistrationDao registrationDao;
 
-    public List<Registration> singleEventRegistrations(String eventId) {
-        return registrationDao.findByEventId(eventId);
+    public List<RegistrationDto> singleEventRegistrations(String eventId) {
+        return registrationDao.findByEventId(eventId).stream().map(Registration::toDto).toList();
     }
 
     public Map<String, Integer> allEvents() {
-        List<Registration> registrations = registrationDao.findAll();
+        List<RegistrationDto> registrations = registrationDao.findAll().stream().map(Registration::toDto).toList();
 
         Map<String, Integer> events = new LinkedHashMap<>();
         registrations.forEach(reg -> events.put(reg.getEventId(), events.getOrDefault(reg.getEventId(), 0) + 1));

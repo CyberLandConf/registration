@@ -1,7 +1,7 @@
 package de.jugda.registration;
 
 import de.jugda.registration.model.EventDto;
-import de.jugda.registration.model.Registration;
+import de.jugda.registration.model.RegistrationDto;
 import de.jugda.registration.service.EmailService;
 import de.jugda.registration.service.EventService;
 import de.jugda.registration.service.ListService;
@@ -57,7 +57,7 @@ public class AdminResource {
     @GET
     @Path("{eventId}")
     public TemplateInstance getEventList(@PathParam("eventId") String eventId) {
-        List<Registration> registrations = listService.singleEventRegistrations(eventId);
+        List<RegistrationDto> registrations = listService.singleEventRegistrations(eventId);
         EventDto event = eventService.getEvent(eventId);
 
         return list.data("eventId", eventId)
@@ -70,7 +70,7 @@ public class AdminResource {
     @GET
     @Path("{eventId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Registration> getRegistrationList(@PathParam("eventId") String eventId) {
+    public List<RegistrationDto> getRegistrationList(@PathParam("eventId") String eventId) {
         return listService.singleEventRegistrations(eventId);
     }
 
@@ -97,7 +97,7 @@ public class AdminResource {
         }
 
         AtomicInteger index = new AtomicInteger(0);
-        Collection<List<Registration>> chunkedRegistrations = listService.singleEventRegistrations(eventId).stream()
+        Collection<List<RegistrationDto>> chunkedRegistrations = listService.singleEventRegistrations(eventId).stream()
             .filter(registration -> registrationIds.contains(registration.getId()))
             .collect(Collectors.groupingBy(x -> index.getAndIncrement() / 50)).values();
 
@@ -127,7 +127,7 @@ Dein {{tenant.name}} Orga-Team""";
 
 
         AtomicInteger index = new AtomicInteger(0);
-        Collection<List<Registration>> chunkedRegistrations = listService.singleEventRegistrations(eventId).stream()
+        Collection<List<RegistrationDto>> chunkedRegistrations = listService.singleEventRegistrations(eventId).stream()
             .collect(Collectors.groupingBy(x -> index.getAndIncrement() / 50)).values();
 
         if (!chunkedRegistrations.isEmpty()) {

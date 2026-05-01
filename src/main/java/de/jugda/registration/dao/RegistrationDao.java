@@ -1,9 +1,15 @@
 package de.jugda.registration.dao;
 
 import de.jugda.registration.Config;
-import de.jugda.registration.model.Registration;
+import de.jugda.registration.domain.Registration;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
@@ -22,6 +28,9 @@ import java.util.stream.Collectors;
 public class RegistrationDao {
 
     @Inject
+    private EntityManager em;
+
+    @Inject
     DynamoDbClient dynamoDB;
     @Inject
     Config config;
@@ -29,23 +38,20 @@ public class RegistrationDao {
     private static final String attributesToGet = "id, eventId, #name, email, pub, remote, waitlist, privacy, created, #ttl";
     private static final Map<String, String> expressionAttributeNames = Map.of("#name", "name", "#ttl", "ttl");
 
+    @Transactional
     public void save(Registration registration) {
-        dynamoDB.putItem(builder -> builder
-            .tableName(config.dynamodb().table())
-            .item(registration.toItem()));
+        em.persist(registration);
     }
 
-    public Registration find(Registration registration) {
-        return dynamoDB.query(builder -> baseQueryRequestBuilder(builder)
-            .expressionAttributeValues(Map.of(
-                ":v_eventId", toAttribute(registration.getEventId()),
-                ":v_email", toAttribute(registration.getEmail())
-            ))
-            .keyConditionExpression("eventId = :v_eventId and email = :v_email")
-        ).items().stream()
-            .map(Registration::from)
-            .findFirst()
-            .orElse(null);
+    public Registration findByEventIdAndEmail(Registration registration) {
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<Registration> cq = criteriaBuilder.createQuery(Registration.class);
+        Root<Registration> root = cq.from(Registration.class);
+
+        Predicate where = criteriaBuilder.and(criteriaBuilder.equal(root.get("eventId"), registration.getEventId()), criteriaBuilder.equal(root.get("email"), registration.getEmail()));
+        cq.select(root).where(where);
+
+        return em.createQuery(cq).getSingleResultOrNull();
     }
 
     public List<Registration> findAll() {

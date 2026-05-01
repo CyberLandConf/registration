@@ -1,8 +1,9 @@
 package de.jugda.registration.service;
 
 import de.jugda.registration.dao.RegistrationDao;
+import de.jugda.registration.domain.Registration;
 import de.jugda.registration.model.DeregistrationForm;
-import de.jugda.registration.model.Registration;
+import de.jugda.registration.model.RegistrationDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -23,7 +24,7 @@ public class DeleteService {
         Registration registration = new Registration();
         registration.setEventId(form.getEventId());
         registration.setEmail(form.getEmail().toLowerCase());
-        registration = registrationDao.find(registration);
+        registration = registrationDao.findByEventIdAndEmail(registration);
         return deleteFromUri(registration.getId());
     }
 
@@ -51,7 +52,7 @@ public class DeleteService {
             Registration waiter = waitlist.getFirst();
             waiter.setWaitlist(false);
             registrationDao.save(waiter);
-            emailService.sendWaitlistToAttendeeConfirmation(waiter);
+            emailService.sendWaitlistToAttendeeConfirmation(waiter.toDto());
         }
     }
 
