@@ -63,11 +63,14 @@ public class RegistrationDao {
     }
 
     public List<Registration> findByEventId(String eventId) {
-        return dynamoDB.queryPaginator(builder -> byEventIdQueryBuilder(builder, eventId))
-            .items().stream()
-            .map(Registration::from)
-            .sorted(Comparator.comparing(Registration::getCreated))
-            .collect(Collectors.toList());
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<Registration> cq = criteriaBuilder.createQuery(Registration.class);
+        Root<Registration> root = cq.from(Registration.class);
+
+        Predicate where = criteriaBuilder.equal(root.get("eventId"), eventId);
+        cq.select(root).where(where);
+
+        return em.createQuery(cq).getResultList();
     }
 
     public List<Registration> findWaitlistByEventId(String eventId) {

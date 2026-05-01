@@ -45,4 +45,17 @@ class RegistrationDaoTest {
         assertThat(foundRegistration).hasSize(1);
     }
 
+    @Test
+    public void roundTripFindByEventId(){
+        Registration registration = new Registration();
+        registration.setEventId("eventId3");
+        registration.setEmail("email3");
+
+        registrationDaoUnderTest.save(registration);
+
+        List<Registration> foundRegistration = registrationDaoUnderTest.findByEventId(registration.getEventId());
+
+        assertThat(foundRegistration).hasSize(1);
+    }
+
 }
