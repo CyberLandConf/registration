@@ -1,17 +1,29 @@
 package de.jugda.registration;
 
+import io.quarkus.mailer.MockMailbox;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Niko Köbler, https://www.n-k.de, @dasniko
  */
 @QuarkusTest
 public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
+
+    @Inject
+    MockMailbox mailbox;
+
+    @BeforeEach
+    void init(){
+        mailbox.clear();
+    }
 
     @Test
     void testGetRegistrationForm() {
@@ -43,6 +55,8 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
             .getString("html.body.p[2].a");
         String registrationId = link.substring(link.indexOf("?id=") + 4);
 
+        assertEquals(1, mailbox.getTotalMessagesSent());
+
         given()
             .queryParam("id", registrationId)
             .delete("/delete")
@@ -69,6 +83,8 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
             .getString("html.body.p[2].a");
         String registrationId = link.substring(link.indexOf("?id=") + 4);
 
+        assertEquals(1, mailbox.getTotalMessagesSent());
+
         given()
             .queryParam("id", registrationId)
             .get("/delete")
@@ -90,6 +106,9 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
             .then()
             .statusCode(200)
             .body("html.body.h3", equalTo("Vielen Dank, " + participant.getName()));
+
+
+        assertEquals(1, mailbox.getTotalMessagesSent());
 
         // test if the deletion form returns
         given()

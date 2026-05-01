@@ -4,24 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.jugda.registration.Config;
 import de.jugda.registration.model.Event;
 import de.jugda.registration.model.Registration;
+import io.quarkus.mailer.Mail;
+import io.quarkus.mailer.Mailer;
 import io.quarkus.qute.Location;
+import io.quarkus.qute.Qute;
 import io.quarkus.qute.Template;
 import io.quarkus.runtime.LaunchMode;
-import io.quarkus.runtime.configuration.ConfigUtils;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.SneakyThrows;
-import software.amazon.awssdk.services.ses.SesClient;
-import software.amazon.awssdk.services.ses.model.BulkEmailDestination;
-import software.amazon.awssdk.services.ses.model.Content;
-import software.amazon.awssdk.services.ses.model.TemplateDoesNotExistException;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * @author Niko Köbler, https://www.n-k.de, @dasniko
@@ -30,7 +25,7 @@ import java.util.stream.Collectors;
 public class EmailService {
 
     @Inject
-    SesClient ses;
+    Mailer mailer;
     @Inject
     Config config;
     @Inject
@@ -73,74 +68,22 @@ public class EmailService {
     }
 
     private void sendEmail(Registration registration, String subject, String mailBody) {
-        ses.sendEmail(builder -> builder
-            .source(config.email().from())
-            .destination(db -> db.toAddresses(registration.getEmail()))
-            .message(mb -> mb
-                .subject(utf8Content(subject))
-                .body(bb -> bb
-                    .html(utf8Content(mailBody))
-                    .text(utf8Content(strip(mailBody)))
-                )
-            )
-        );
+        Mail mail = Mail.withHtml(registration.email, subject, mailBody);
+        mailer.send(mail);
     }
 
     public void sendBulkEmail(Collection<List<Registration>> chunkedRegistrations, String templateName, String subject, String body) {
-        Config.TenantConfig tenant = config.tenant();
-        String tenantTemplateName = tenant.id() + "_" + templateName;
-        updateSesTemplate(tenantTemplateName, subject, body);
+        Qute.Fmt messageTemplate = Qute.fmt(body)
+            .data("tenant", config.tenant());
 
-        String defaultTemplateData = objectToString(Map.of("tenant", tenant));
-
-        chunkedRegistrations.forEach(registrationsChunk -> {
-            List<BulkEmailDestination> destinations = registrationsChunk.stream()
-                .map(registration -> BulkEmailDestination.builder()
-                    .destination(db -> db.toAddresses(registration.getEmail()))
-                    .replacementTemplateData(objectToString(registration))
-                    .build())
-                .collect(Collectors.toList());
-
-            if (launchMode != LaunchMode.TEST && !ConfigUtils.isProfileActive("localstack")) {
-                ses.sendBulkTemplatedEmail(builder -> builder
-                    .template(tenantTemplateName)
-                    .defaultTemplateData(defaultTemplateData)
-                    .source(config.email().from())
-                    .destinations(destinations)
-                    .configurationSetName("BasicConfigSet")
-                );
-            }
+        chunkedRegistrations.stream().flatMap(Collection::stream).forEach(registration -> {
+            String emailMessage = messageTemplate.data("name", registration.getName()).data("eventId", registration.eventId).render();
+            mailer.send(Mail.withHtml(registration.email, Qute.fmt(subject).data("name", registration.name).render(), emailMessage));
         });
+
+
     }
 
-    private void updateSesTemplate(String templateName, String subject, String body) {
-        software.amazon.awssdk.services.ses.model.Template sesTemplate =
-            software.amazon.awssdk.services.ses.model.Template.builder()
-                .templateName(templateName)
-                .subjectPart(subject)
-                .textPart(body)
-                .build();
-        try {
-            ses.updateTemplate(builder -> builder.template(sesTemplate));
-        } catch (TemplateDoesNotExistException e) {
-            ses.createTemplate(builder -> builder.template(sesTemplate));
-        }
-    }
 
-    @SneakyThrows
-    private String objectToString(Object o) {
-        return objectMapper.writeValueAsString(o);
-    }
 
-    private Content utf8Content(String data) {
-        return Content.builder()
-            .charset(StandardCharsets.UTF_8.name())
-            .data(data)
-            .build();
-    }
-
-    private static final Pattern TAGS = Pattern.compile("<.+?>");
-    private String strip(String html) {
-        return TAGS.matcher(html).replaceAll("").replaceAll(" {2}", "");
-    }
 }
