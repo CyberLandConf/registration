@@ -1,6 +1,6 @@
 package de.jugda.registration;
 
-import de.jugda.registration.model.Registration;
+import de.jugda.registration.model.RegistrationDto;
 import de.jugda.registration.model.RegistrationForm;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Niko Köbler, https://www.n-k.de, @dasniko
  */
-public class RegistrationTest {
+public class RegistrationDtoTest {
     @Test
     public void testStaticOfForm() {
         RegistrationForm form = new RegistrationForm();
@@ -19,7 +19,7 @@ public class RegistrationTest {
         form.setEmail("john@doe.com");
         form.setPub("on");
 
-        Registration reg = Registration.of(form);
+        RegistrationDto reg = RegistrationDto.of(form);
 
         assertEquals("2018-12-31", reg.getEventId());
         assertEquals("John Doe", reg.getName());

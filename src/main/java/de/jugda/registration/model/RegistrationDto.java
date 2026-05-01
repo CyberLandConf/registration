@@ -22,7 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @RegisterForReflection
 @TemplateData
-public class Registration {
+public class RegistrationDto {
     public String id;
     public String eventId;
     public String name;
@@ -39,8 +39,8 @@ public class Registration {
         return created.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
-    public static Registration of(RegistrationForm form) {
-        Registration registration = new Registration();
+    public static RegistrationDto of(RegistrationForm form) {
+        RegistrationDto registration = new RegistrationDto();
         registration.setEventId(form.getEventId());
         registration.setName(form.getName().trim());
         registration.setEmail(form.getEmail().trim().toLowerCase());
@@ -53,8 +53,8 @@ public class Registration {
         return registration;
     }
 
-    public static Registration from(Map<String, AttributeValue> item) {
-        Registration registration = new Registration();
+    public static RegistrationDto from(Map<String, AttributeValue> item) {
+        RegistrationDto registration = new RegistrationDto();
         if (item != null && !item.isEmpty()) {
             registration.setId(item.get("id").s());
             registration.setEventId(item.get("eventId").s());
