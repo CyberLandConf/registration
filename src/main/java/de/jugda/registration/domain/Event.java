@@ -1,13 +1,13 @@
 package de.jugda.registration.domain;
 
 import de.jugda.registration.model.EventDto;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 public class Event {
@@ -18,6 +18,7 @@ public class Event {
     private String eventId;
     private String summary;
     private String title;
+    @Column(columnDefinition = "text")
     private String description;
     private String speaker;
     private String twitter;

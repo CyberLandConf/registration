@@ -4,7 +4,7 @@ CREATE TABLE Event
     eventId     VARCHAR(255),
     summary     VARCHAR(255),
     title       VARCHAR(255),
-    description VARCHAR(255),
+    description TEXT,
     speaker     VARCHAR(255),
     twitter     VARCHAR(255),
     location    VARCHAR(255),
