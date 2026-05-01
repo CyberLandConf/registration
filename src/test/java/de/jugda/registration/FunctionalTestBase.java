@@ -13,7 +13,7 @@ import java.util.List;
 @QuarkusTestResource(LocalstackResource.class)
 public abstract class FunctionalTestBase {
 
-    static final String EVENT_ID = "2026-04-26";
+    static final String EVENT_ID = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
 
     static final List<Participant> PARTICIPANTS = List.of(
         new Participant("John Doe", "john.doe@example.com"),
