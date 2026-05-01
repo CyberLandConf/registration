@@ -1,6 +1,6 @@
 package de.jugda.registration;
 
-import de.jugda.registration.model.Event;
+import de.jugda.registration.model.EventDto;
 import de.jugda.registration.service.EventService;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
@@ -43,12 +43,11 @@ public class WebinarResource {
             return webinarNotAvailable.data("tenant", config.tenant());
         }
 
-        Event event = eventService.getEvent(eventId);
-        Map<String, String> eventData = eventService.getEventData().get(eventId);
+        EventDto event = eventService.getEvent(eventId);
 
         return webinar.data("event", event)
             .data("tenant", config.tenant())
-            .data("eventData", eventData)
+            .data("eventData", event)
             .data("helptext", config.page().webinar());
     }
 

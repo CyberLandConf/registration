@@ -1,6 +1,6 @@
 package de.jugda.registration;
 
-import de.jugda.registration.model.Event;
+import de.jugda.registration.model.EventDto;
 import de.jugda.registration.model.Registration;
 import de.jugda.registration.service.EmailService;
 import de.jugda.registration.service.EventService;
@@ -58,12 +58,11 @@ public class AdminResource {
     @Path("{eventId}")
     public TemplateInstance getEventList(@PathParam("eventId") String eventId) {
         List<Registration> registrations = listService.singleEventRegistrations(eventId);
-        Event event = eventService.getEvent(eventId);
-        Map<String, String> eventData = eventService.getEventData().get(eventId);
+        EventDto event = eventService.getEvent(eventId);
 
         return list.data("eventId", eventId)
             .data("event", event)
-            .data("eventData", eventData)
+            .data("eventData", event)
             .data("tenant", config.tenant())
             .data("registrations", registrations);
     }
@@ -78,8 +77,8 @@ public class AdminResource {
     @PUT
     @Path("{eventId}/data")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response putEventData(@PathParam("eventId") String eventId, Map<String, String> data) {
-        eventService.putEventData(eventId, data);
+    public Response putEventData(@PathParam("eventId") String eventId, EventDto eventDto) {
+        eventService.putEventData(eventId, eventDto);
         return Response.noContent().build();
     }
 

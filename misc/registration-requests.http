@@ -11,7 +11,7 @@ eventId={{eventId}}&name=Gerd&email=gerd@aschemann.net
 PUT {{baseurl}}/admin/events/{{eventId}}/data
 Content-Type: application/json
 
-{"webinarLink" : "https://example.com/webinar"}
+{"url" : "https://example.com/webinar", "title":  "Titel"}
 
 ### Send e-mail message to participants <4>
 PUT {{baseurl}}/admin/events/{{eventId}}/message

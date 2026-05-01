@@ -16,7 +16,8 @@ import java.time.format.DateTimeFormatter;
 @TemplateData
 @RegisterForReflection
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Event {
+public class EventDto {
+    public String eventId;
     public String uid;
     public String summary;
     public String title;
@@ -25,6 +26,7 @@ public class Event {
     public String twitter;
     public String location;
     public String url;
+    public String webinarLink;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     public LocalDateTime start;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")

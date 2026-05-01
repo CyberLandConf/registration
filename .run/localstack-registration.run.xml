@@ -18,24 +18,28 @@
               <map />
             </option>
             <option name="passParentEnv" value="true" />
-            <option name="runMavenInBackground" value="true" />
             <option name="skipTests" value="false" />
             <option name="vmOptions" value="" />
           </MavenRunnerSettings>
         </option>
         <option name="myRunnerParameters">
           <MavenRunnerParameters>
+            <option name="cmdOptions" value="-Dquarkus.profile=localstack" />
             <option name="profiles">
               <set />
             </option>
             <option name="goals">
               <list />
             </option>
+            <option name="multimoduleDir" />
             <option name="pomFileName" value="pom.xml" />
             <option name="profilesMap">
               <map>
                 <entry key="localstack" value="true" />
               </map>
+            </option>
+            <option name="projectsCmdOptionValues">
+              <list />
             </option>
             <option name="resolveToWorkspace" value="false" />
             <option name="workingDirPath" value="$PROJECT_DIR$" />
@@ -43,6 +47,8 @@
         </option>
       </MavenSettings>
       <targetMavenLocalRepo />
+      <emulateTerminal>true</emulateTerminal>
+      <profile />
     </QsMavenRunConfiguration>
     <method v="2">
       <option name="Make" enabled="true" />

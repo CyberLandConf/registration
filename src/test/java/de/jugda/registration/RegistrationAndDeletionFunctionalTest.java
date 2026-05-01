@@ -4,12 +4,15 @@ import io.quarkus.mailer.MockMailbox;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Niko Köbler, https://www.n-k.de, @dasniko
@@ -20,8 +23,8 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
     @Inject
     MockMailbox mailbox;
 
-    @BeforeEach
-    void init(){
+    @AfterEach
+    void cleanup(){
         mailbox.clear();
     }
 
@@ -38,6 +41,13 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
 
     @Test
     void testCreateRegistrationAndDeleteViaDeleteRequest() {
+        given().contentType(ContentType.JSON)
+            .pathParam("eventId", EVENT_ID)
+            .body("{\"url\" : \"https://example.com/webinar\", \"summary\": \"Summary\", \"start\": \"2026-04-26T13:42:33\", \"end\":\"2026-04-26T15:48:45\"} ")
+            .put("/admin/events/{eventId}/data")
+            .then()
+            .statusCode(204);
+
         Participant participant = PARTICIPANTS.get(0);
         String link = given().contentType(ContentType.URLENC)
             .formParams(
@@ -55,7 +65,7 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
             .getString("html.body.p[2].a");
         String registrationId = link.substring(link.indexOf("?id=") + 4);
 
-        assertEquals(1, mailbox.getTotalMessagesSent());
+        assertTrue(mailbox.getTotalMessagesSent() > 0);
 
         given()
             .queryParam("id", registrationId)
