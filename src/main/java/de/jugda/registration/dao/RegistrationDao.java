@@ -1,6 +1,5 @@
 package de.jugda.registration.dao;
 
-import de.jugda.registration.Config;
 import de.jugda.registration.domain.Registration;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -10,16 +9,8 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
-import software.amazon.awssdk.services.dynamodb.model.Select;
 
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Niko Köbler, http://www.n-k.de, @dasniko
@@ -29,14 +20,6 @@ public class RegistrationDao {
 
     @Inject
     private EntityManager em;
-
-    @Inject
-    DynamoDbClient dynamoDB;
-    @Inject
-    Config config;
-
-    private static final String attributesToGet = "id, eventId, #name, email, pub, remote, waitlist, privacy, created, #ttl";
-    private static final Map<String, String> expressionAttributeNames = Map.of("#name", "name", "#ttl", "ttl");
 
     @Transactional
     public void save(Registration registration) {
@@ -96,27 +79,4 @@ public class RegistrationDao {
         return registration;
     }
 
-    private QueryRequest.Builder baseQueryRequestBuilder(QueryRequest.Builder builder) {
-        return builder
-            .tableName(config.dynamodb().table())
-            .indexName(config.dynamodb().index())
-            .projectionExpression(attributesToGet)
-            .expressionAttributeNames(expressionAttributeNames)
-            ;
-    }
-
-    private QueryRequest.Builder byEventIdQueryBuilder(QueryRequest.Builder builder, String eventId) {
-        return baseQueryRequestBuilder(builder)
-            .keyConditionExpression("eventId = :v_eventId")
-            .expressionAttributeValues(getBaseAttributeValues(eventId))
-            ;
-    }
-
-    private AttributeValue toAttribute(String value) {
-        return AttributeValue.builder().s(value).build();
-    }
-
-    private Map<String, AttributeValue> getBaseAttributeValues(String eventId) {
-        return Map.of(":v_eventId", toAttribute(eventId));
-    }
 }
