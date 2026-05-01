@@ -58,4 +58,20 @@ class RegistrationDaoTest {
         assertThat(foundRegistration).hasSize(1);
     }
 
+    @Test
+    public void roundtripFindWaitlistByEventId(){
+        Registration registration = new Registration();
+        registration.setEventId("eventId4");
+        registration.setEmail("email4");
+        registration.setWaitlist(true);
+
+        registrationDaoUnderTest.save(registration);
+
+        List<Registration> waitingList = registrationDaoUnderTest.findWaitlistByEventId(registration.getEventId());
+
+        assertThat(waitingList).hasSize(1);
+
+
+    }
+
 }
