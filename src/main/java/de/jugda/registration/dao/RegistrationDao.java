@@ -78,15 +78,14 @@ public class RegistrationDao {
     }
 
     public int getCount(String eventId) {
-        HashMap<String, AttributeValue> attributeValues = new HashMap<>(getBaseAttributeValues(eventId));
-        attributeValues.put(":v_remote", AttributeValue.builder().bool(false).build());
-        return dynamoDB.query(builder -> byEventIdQueryBuilder(builder, eventId)
-            .projectionExpression(null)
-            .expressionAttributeNames(null)
-            .filterExpression("remote = :v_remote")
-            .expressionAttributeValues(attributeValues)
-            .select(Select.COUNT)
-        ).count();
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = criteriaBuilder.createQuery(Long.class);
+        Root<Registration> root = cq.from(Registration.class);
+
+        Predicate where = criteriaBuilder.and(criteriaBuilder.equal(root.get("eventId"), eventId), criteriaBuilder.equal(root.get("remote"), false));
+        cq.select(criteriaBuilder.count(root)).where(where);
+
+        return em.createQuery(cq).getSingleResult().intValue();
     }
 
     public Registration delete(String id) {

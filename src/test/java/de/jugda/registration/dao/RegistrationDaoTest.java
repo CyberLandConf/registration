@@ -70,8 +70,19 @@ class RegistrationDaoTest {
         List<Registration> waitingList = registrationDaoUnderTest.findWaitlistByEventId(registration.getEventId());
 
         assertThat(waitingList).hasSize(1);
+    }
 
+    @Test
+    public void rountripGetCount(){
+        Registration registration = new Registration();
+        registration.setEventId("eventId5");
+        registration.setEmail("email5");
+        registration.setRemote(false);
 
+        registrationDaoUnderTest.save(registration);
+
+        int count = registrationDaoUnderTest.getCount(registration.getEventId());
+        assertThat(count).isEqualTo(1);
     }
 
 }
