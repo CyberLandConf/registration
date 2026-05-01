@@ -55,14 +55,11 @@ public class RegistrationDao {
     }
 
     public List<Registration> findAll() {
-        return dynamoDB.scanPaginator(builder -> builder
-            .tableName(config.dynamodb().table())
-            .projectionExpression(attributesToGet)
-            .expressionAttributeNames(expressionAttributeNames)
-        ).items().stream()
-            .map(Registration::from)
-            .sorted(Comparator.comparing(Registration::getEventId))
-            .collect(Collectors.toList());
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<Registration> cq = criteriaBuilder.createQuery(Registration.class);
+        cq.select(cq.from(Registration.class));
+
+        return em.createQuery(cq).getResultList();
     }
 
     public List<Registration> findByEventId(String eventId) {
@@ -129,5 +126,4 @@ public class RegistrationDao {
     private Map<String, AttributeValue> getBaseAttributeValues(String eventId) {
         return Map.of(":v_eventId", toAttribute(eventId));
     }
-
 }
