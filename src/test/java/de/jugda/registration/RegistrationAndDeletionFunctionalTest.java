@@ -4,7 +4,9 @@ import io.quarkus.mailer.MockMailbox;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.AfterEach;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
@@ -21,9 +23,14 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
     @Inject
     MockMailbox mailbox;
 
-    @AfterEach
+    @Inject
+    EntityManager em;
+
+    @BeforeEach
+    @Transactional
     void cleanup(){
         mailbox.clear();
+        em.createQuery("DELETE FROM Registration e").executeUpdate();
     }
 
     @Test

@@ -10,6 +10,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 /**
@@ -31,6 +32,11 @@ public class RegistrationDto {
     public boolean remote;
     public LocalDateTime created;
     public Long ttl;
+
+    // needed by template
+    public String formattedCreationDate() {
+        return created.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+    }
 
     public static RegistrationDto of(RegistrationForm form) {
         RegistrationDto registration = new RegistrationDto();
