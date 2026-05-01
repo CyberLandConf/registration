@@ -5,8 +5,6 @@ import de.jugda.registration.model.RegistrationForm;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-import software.amazon.awssdk.utils.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -133,26 +131,8 @@ public class Registration {
         return registration;
     }
 
-    public static Registration from(Map<String, AttributeValue> item) {
-        Registration registration = new Registration();
-        if (item != null && !item.isEmpty()) {
-            registration.setId(item.get("id").s());
-            registration.setEventId(item.get("eventId").s());
-            registration.setName(item.get("name").s());
-            registration.setEmail(item.get("email").s());
-            registration.setPub(item.get("pub").bool());
-            registration.setWaitlist(item.get("waitlist").bool());
-            registration.setPrivacy(item.get("privacy").bool());
-            registration.setVideoRecording(item.getOrDefault("videoRecording", AttributeValue.builder().bool(false).build()).bool());
-            registration.setRemote(item.getOrDefault("remote", AttributeValue.builder().bool(false).build()).bool());
-            registration.setCreated(LocalDateTime.parse(item.get("created").s()));
-            registration.setTtl(Long.valueOf(item.get("ttl").n()));
-        }
-        return registration;
-    }
-
     private static boolean onOrOff(String s) {
-        return (StringUtils.isBlank(s) ? "off" : s).equalsIgnoreCase("on");
+        return (s == null || s.isBlank() ? "off" : s).equalsIgnoreCase("on");
     }
 
     public RegistrationDto toDto() {
