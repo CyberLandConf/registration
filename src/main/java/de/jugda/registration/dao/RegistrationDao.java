@@ -26,12 +26,12 @@ public class RegistrationDao {
         em.persist(registration);
     }
 
-    public Registration findByEventIdAndEmail(Registration registration) {
+    public Registration findByEventIdAndEmail(String eventId, String email) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Registration> cq = criteriaBuilder.createQuery(Registration.class);
         Root<Registration> root = cq.from(Registration.class);
 
-        Predicate where = criteriaBuilder.and(criteriaBuilder.equal(root.get("eventId"), registration.getEventId()), criteriaBuilder.equal(root.get("email"), registration.getEmail()));
+        Predicate where = criteriaBuilder.and(criteriaBuilder.equal(root.get("eventId"), eventId), criteriaBuilder.equal(root.get("email"), email));
         cq.select(root).where(where);
 
         return em.createQuery(cq).getSingleResultOrNull();

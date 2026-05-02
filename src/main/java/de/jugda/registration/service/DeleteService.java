@@ -3,7 +3,6 @@ package de.jugda.registration.service;
 import de.jugda.registration.dao.RegistrationDao;
 import de.jugda.registration.domain.Registration;
 import de.jugda.registration.model.DeregistrationForm;
-import de.jugda.registration.model.RegistrationDto;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -21,10 +20,7 @@ public class DeleteService {
     EmailService emailService;
 
     public String deleteFromUi(DeregistrationForm form) {
-        Registration registration = new Registration();
-        registration.setEventId(form.getEventId());
-        registration.setEmail(form.getEmail().toLowerCase());
-        registration = registrationDao.findByEventIdAndEmail(registration);
+        Registration registration = registrationDao.findByEventIdAndEmail(form.getEventId(), form.getEmail().toLowerCase() );
         return deleteFromUri(registration.getId());
     }
 

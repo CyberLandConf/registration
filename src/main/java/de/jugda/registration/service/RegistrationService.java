@@ -2,7 +2,6 @@ package de.jugda.registration.service;
 
 import de.jugda.registration.dao.RegistrationDao;
 import de.jugda.registration.domain.Registration;
-import de.jugda.registration.model.RegistrationDto;
 import de.jugda.registration.model.RegistrationForm;
 import de.jugda.registration.slack.SlackWebClient;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -30,7 +29,7 @@ public class RegistrationService {
     public RegistrationForm handleRegistration(RegistrationForm model) {
         Registration registration = Registration.of(model);
 
-        Registration existingRegistration = registrationDao.findByEventIdAndEmail(registration);
+        Registration existingRegistration = registrationDao.findByEventIdAndEmail(registration.getEventId(), registration.getEmail() );
         if (null != existingRegistration) {
             registration.setId(existingRegistration.getId());
         }
@@ -42,7 +41,7 @@ public class RegistrationService {
         Registration savedRegistration;
         AtomicInteger counter = new AtomicInteger();
         do {
-            savedRegistration = registrationDao.findByEventIdAndEmail(registration);
+            savedRegistration = registrationDao.findByEventIdAndEmail(registration.getEventId(), registration.getEmail() );
             if (savedRegistration == null) {
                 try {
                     //noinspection BusyWait

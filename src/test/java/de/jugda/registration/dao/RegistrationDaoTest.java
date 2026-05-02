@@ -38,7 +38,7 @@ class RegistrationDaoTest {
 
         registrationDaoUnderTest.save(registration);
 
-        Registration foundRegistration = registrationDaoUnderTest.findByEventIdAndEmail(registration);
+        Registration foundRegistration = registrationDaoUnderTest.findByEventIdAndEmail(registration.getEventId(), registration.getEmail() );
 
         assertThat(foundRegistration.getEventId()).isEqualTo(registration.getEventId());
         assertThat(foundRegistration.getEmail()).isEqualTo(registration.getEmail());
