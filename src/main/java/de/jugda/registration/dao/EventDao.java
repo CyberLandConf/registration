@@ -32,7 +32,7 @@ public class EventDao {
          return em.createQuery(cq).getResultList();
      }
 
-     public Event getEventByEventId(String eventId){
+     public Event getEventByEventId(String eventId) {
          CriteriaBuilder cb = em.getCriteriaBuilder();
          CriteriaQuery<Event> cq = cb.createQuery(Event.class);
          Root<Event> root = cq.from(Event.class);
@@ -46,4 +46,5 @@ public class EventDao {
          }
          return resultList.get(0);
      }
+
 }

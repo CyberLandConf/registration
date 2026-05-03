@@ -55,33 +55,22 @@ Root page is `/registration?eventId=...`.
 [[local-environment]]
 * Docker (optional, for local development)
 
-=== Development with profile `localstack`
-
-https://github.com/localstack/localstack[localstack] enables local development without any AWS cloud access. +
-We use the Docker container of localstack directly without the need to install any additional tool locally.
+=== Development with profile `local`
 
 * For <<local-environment,local AWS development>>, simply power up the provided `docker-compose.yml` file in the `src/docker` folder with `docker compose up` command. +
-The container will start and initialize all the needed AWS resoures like DynamoDB, S3 bucket and files and SES, available at http://localhost:4566
+The container will start and initialize all the needed resoures like PostgreSQL and Mailpit.
 * (Optional) Build application: `mvn clean package`
-* Run application with `localstack` profile:
-** With Maven, use https://quarkus.io/guides/maven-tooling#development-mode[Quarkus Development Mode]: `mvn compile quarkus:dev -Dquarkus.profile=localstack`
+* Run application with `local` profile:
+** With Maven, use https://quarkus.io/guides/maven-tooling#development-mode[Quarkus Development Mode]: `mvn compile quarkus:dev -Dquarkus.profile=local`
 +
 TIP: You can now change classes, configurations and other resources on the fly and Quarkus will automatically reload on the next call.
 +
-[IMPORTANT]
-====
-If an error occurs: "software.amazon.awssdk.core.exception.SdkClientException: Unable to load credentials from any of the providers in the chain", you need to set following env variables (dummy value is ok for localstack usage, it will automatically set when using the IntelliJ localstack run config):
-----
-AWS_ACCESS_KEY_ID=dummy
-AWS_SECRET_ACCESS_KEY=dummy
-----
-====
 
 ** In IntelliJ start via run configuration:
 +
 image::src/asciidoctor/images/intellij-run-configuration-dev.png[]
 +
-IMPORTANT: Change the `dev` profile in the image with `localstack`
+IMPORTANT: Change the `dev` profile in the image with `local`
 +
 TIP: This makes it even possible to run the application in debug mode.
 
@@ -97,12 +86,16 @@ Native, Docker will be used.
 
 == Deployment
 
-https://www.serverless.com/[Serverless Framework]
+TBD
 
 === JUG DA
+
+In progress
 
  $ TENANT=jugda sls deploy
 
 === Cyberland
+
+In progress
 
  $ TENANT=cyberland sls deploy

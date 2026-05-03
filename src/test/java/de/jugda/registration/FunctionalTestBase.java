@@ -1,6 +1,5 @@
 package de.jugda.registration;
 
-import io.quarkus.test.common.QuarkusTestResource;
 import lombok.Value;
 
 import java.time.LocalDateTime;
@@ -10,7 +9,6 @@ import java.util.List;
 /**
  * @author Niko Köbler, https://www.n-k.de, @dasniko
  */
-@QuarkusTestResource(LocalstackResource.class)
 public abstract class FunctionalTestBase {
 
     static final String EVENT_ID = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE);

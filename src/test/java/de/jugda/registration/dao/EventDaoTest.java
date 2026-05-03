@@ -34,7 +34,7 @@ class EventDaoTest {
 
     @Test
     @Transactional
-    public void roundTripfindEvent() {
+    public void roundTripFindEvent() {
         Event event = new Event();
         event.setTitle("Test");
         event.setEventId("2026-04-27");

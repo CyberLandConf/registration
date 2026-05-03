@@ -1,18 +1,6 @@
 version: '2.1'
 
 services:
-  localstack:
-    image: localstack/localstack:0.13
-    ports:
-      - "4566:4566"
-      - "4571:4571"
-    environment:
-      - SERVICES=dynamodb,s3,ses
-    volumes:
-      - ../test/resources/dynamodb-schema.json:/tmp/dynamodb-schema.json
-      - ../test/resources/s3/eventData.json:/tmp/eventData.json
-      - ../../target/events.json:/tmp/events.json
-      - ./configure_localstack.sh:/docker-entrypoint-initaws.d/setup.sh
   database:
     image: postgres
     ports:
