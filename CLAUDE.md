@@ -83,6 +83,9 @@ Qute HTML templates in `src/main/resources/templates/`. Mail templates are in `t
 ### Database Migrations
 Flyway migrations in `src/main/resources/db/migration/`. Run automatically at startup. Schema is managed solely via Flyway (`quarkus.hibernate-orm.schema-management.strategy=none`).
 
+### CORS
+`quarkus.http.cors.methods` in `application.properties` muss alle Methoden enthalten, die das Frontend nutzt -- aktuell `GET,POST,PUT,DELETE,OPTIONS`. Der CORS-Filter laeuft **vor** Authentifizierung und Routing: eine fehlende Methode wird mit einem **403 ohne Body** abgewiesen, was wie ein Rechteproblem aussieht, aber keines ist. Bis 2026-08-19 fehlten hier `PUT` und `DELETE`, wodurch saemtliche schreibenden Admin-Funktionen (Event-Daten speichern, Rundmail, Anmeldung loeschen) im Browser stumm fehlschlugen.
+
 ### Authentication (OIDC / Keycloak)
 - Production Keycloak: `https://id.ijug.eu/realms/ijug`
 - Client ID: `registration`
