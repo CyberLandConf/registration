@@ -60,12 +60,15 @@
             <a href="/registration/{tenant}/delete?eventId={form.eventId}">Dann klicke hier.</a>
         </small>
     </p>
+{/body}
+{#scripts}
 <script>
-    $(function() {
-        $(".required").click(function(){
-            $($(document.forms[0].submit)).prop('disabled',$('input.required:checked').length !== $('input.required').length);
+    $(function () {
+        const $required = $('input.required');
+        $required.on('change', function () {
+            $('#submit').prop('disabled', $required.filter(':checked').length !== $required.length);
         });
     });
 </script>
-{/body}
+{/scripts}
 {/include}

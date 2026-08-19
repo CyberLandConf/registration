@@ -76,6 +76,10 @@ Known tenants (seeded in `V3__tenant.sql`): `test`, `jugda`, `cyberland`.
 ### Templates
 Qute HTML templates in `src/main/resources/templates/`. Mail templates are in `templates/mail/`. All templates share `template.html` as the base layout via Qute includes.
 
+**Seiten-Scripts gehoeren in den `{#scripts}`-Block, nicht in `{#body}`.** `template.html` laedt jQuery und Bootstrap am Ende von `<body>` und stellt danach einen `{#insert scripts}{/}`-Slot bereit. Ein `<script>` innerhalb von `{#body}` wird vor den Lib-Tags gerendert und laeuft damit, bevor `$` existiert -- ohne sichtbaren Fehler, die Seite bleibt einfach tot.
+
+`async`/`defer` sind auf den Lib-Tags bewusst nicht gesetzt: `defer` wirkt nicht auf Inline-Scripts, ein deferter jQuery-Tag wuerde die Slot-Scripts also weiterhin ueberholen. Wer `defer` will, muss alle Slot-Scripts in `DOMContentLoaded` kapseln.
+
 ### Database Migrations
 Flyway migrations in `src/main/resources/db/migration/`. Run automatically at startup. Schema is managed solely via Flyway (`quarkus.hibernate-orm.schema-management.strategy=none`).
 
