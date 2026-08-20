@@ -83,6 +83,53 @@ Qute HTML templates in `src/main/resources/templates/`. Mail templates are in `t
 ### Database Migrations
 Flyway migrations in `src/main/resources/db/migration/`. Run automatically at startup. Schema is managed solely via Flyway (`quarkus.hibernate-orm.schema-management.strategy=none`).
 
+### Teilnehmer-Mails per CDI-Event (asynchron)
+
+Kein Teilnehmer-Mailversand haengt mehr in der JTA-Transaktion. Die Services machen nur noch DB-Arbeit
+und feuern am Ende ein CDI-Event aus `de.jugda.registration.event`:
+
+- `RegistrationService.handleRegistration()` -> `RegistrationConfirmed`
+- `DeleteService.processWaitlist()` -> `WaitlistPromoted`
+
+Beide sind Records `(tenantId, baseUrl, RegistrationDto)` und implementieren das sealed Interface
+`RegistrationEvent`. In `EmailService` haengen daran genau zwei Observer -- **nicht pro Event-Typ,
+sondern einmal auf dem Supertyp**, weil CDI Observer ueber die Laufzeitklasse und deren Supertypen
+aufloest:
+
+1. `relayAfterCommit(@Observes(during = AFTER_SUCCESS) RegistrationEvent)` -- laeuft erst nach dem
+   Commit, damit keine Mail fuer eine zurueckgerollte Transaktion rausgeht, und feuert dasselbe Event
+   via `fireAsync()` erneut. `fireAsync` erreicht nur `@ObservesAsync`-Methoden, also keine Schleife.
+2. `onRegistrationEvent(@ObservesAsync RegistrationEvent)` -- rendert und versendet die Mail auf einem
+   Worker-Thread. Welches Template und welcher Betreff, entscheidet ein `switch` ueber das sealed
+   Interface: ein neuer Event-Typ bricht damit die Kompilierung, statt still keine Mail zu schicken.
+
+**Wichtig fuer den Async-Observer:** Dort ist kein HTTP-Request aktiv. `UriInfo` ist deshalb nicht
+benutzbar -- die Base-URL steckt im Event-Payload. Der Request-*Kontext* dagegen ist da: ArC aktiviert
+ihn um jede Observer-Notification herum (`EventImpl.Notifier.notify`, solange
+`quarkus.arc.strict-compatibility` aus ist -- Default). Selbst aktivieren muss man ihn also nicht,
+gesetzt werden muss nur `TenantContext.tenantId` aus dem Payload, sonst laufen `CurrentTenantResolver`,
+`EventService` und `Tenant.findById()` ins Leere. (Frueher stand hier ein manuelles
+`Arc.container().requestContext().activate()`; eine Probe hat gezeigt, dass der Kontext bereits aktiv
+ist und der Block nie lief.) `@ActivateRequestContext` waere ohnehin wirkungslos, weil Interceptoren
+auf Observer-Methoden nicht greifen.
+
+Exceptions asynchroner Observer landen in einem `CompletionStage`, den niemand auswertet -- deshalb
+loggt `onRegistrationEvent()` selbst. Folge: Ein fehlgeschlagener Mailversand rollt die Transaktion
+nicht mehr zurueck, der Nutzer sieht trotzdem die Danke-Seite.
+
+Die Rundmail (`EmailService.sendBulkEmail`, Admin-UI) laeuft weiterhin synchron im Request -- sie hat
+kein Transaktions-Problem und der Admin will das Ergebnis sofort sehen. Sie verschickt pro 50er-Chunk
+(gebildet in `AdminEventsResource.sendMessage`) *einen* `mailer.send(Mail...)`-Aufruf, den der Mailer
+gebuendelt abarbeitet. Der Chunk darf also nicht flachgeklopft werden -- sonst geht jede Mail einzeln
+und blockierend raus. Das Qute-`Fmt` der Rundmail wird bewusst **nicht** gecacht: Qutes Template-Cache
+ist unbegrenzt, und die Rundmail-Texte sind freier Admin-Text.
+
+Tests: Weil die Mails asynchron rausgehen, sind sie beim Eintreffen der HTTP-Response noch nicht
+zwingend da. `FunctionalTestBase.awaitTotalMails(n)` / `awaitMailsTo(mail, n)` pollen per Awaitility
+(`untilAsserted`) darauf, statt direkt zu assertieren -- ein Timeout meldet dadurch die tatsaechlich
+gezaehlten Mails (`expected: 2 but was: 1`) und nicht nur, dass die Wartezeit abgelaufen ist.
+Die `MockMailbox` haengt in `FunctionalTestBase`, beide Test-Klassen nutzen sie.
+
 ### CORS
 `quarkus.http.cors.methods` in `application.properties` muss alle Methoden enthalten, die das Frontend nutzt -- aktuell `GET,POST,PUT,DELETE,OPTIONS`. Der CORS-Filter laeuft **vor** Authentifizierung und Routing: eine fehlende Methode wird mit einem **403 ohne Body** abgewiesen, was wie ein Rechteproblem aussieht, aber keines ist. Bis 2026-08-19 fehlten hier `PUT` und `DELETE`, wodurch saemtliche schreibenden Admin-Funktionen (Event-Daten speichern, Rundmail, Anmeldung loeschen) im Browser stumm fehlschlugen.
 

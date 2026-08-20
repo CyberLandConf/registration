@@ -1,10 +1,14 @@
 package de.jugda.registration.service;
 
+import de.jugda.registration.TenantContext;
 import de.jugda.registration.domain.Registration;
+import de.jugda.registration.event.WaitlistPromoted;
 import de.jugda.registration.model.DeregistrationForm;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.UriInfo;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -13,7 +17,11 @@ import java.util.UUID;
 public class DeleteService {
 
     @Inject
-    EmailService emailService;
+    Event<WaitlistPromoted> waitlistPromoted;
+    @Inject
+    TenantContext tenantCtx;
+    @Inject
+    UriInfo uriInfo;
 
     @Transactional
     public Optional<String> deleteFromUi(DeregistrationForm form) {
@@ -51,7 +59,8 @@ public class DeleteService {
             .ifPresent(waiter -> {
                 waiter.setWaitlist(false);
                 waiter.persist();
-                emailService.sendWaitlistToAttendeeConfirmation(waiter.toDto());
+                // Delivered only after this transaction commits - see EmailService.
+                waitlistPromoted.fire(new WaitlistPromoted(tenantCtx.getTenantId(), uriInfo.getBaseUri(), waiter.toDto()));
             });
     }
 

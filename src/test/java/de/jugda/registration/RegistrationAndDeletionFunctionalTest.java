@@ -1,6 +1,6 @@
 package de.jugda.registration;
 
-import io.quarkus.mailer.MockMailbox;
+import io.quarkus.mailer.Mail;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
@@ -9,20 +9,18 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Niko Köbler, https://www.n-k.de, @dasniko
  */
 @QuarkusTest
 public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
-
-    @Inject
-    MockMailbox mailbox;
 
     @Inject
     EntityManager em;
@@ -63,6 +61,37 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
     }
 
     @Test
+    void testWaitlistPromotionMailIsSentAfterAttendeeDeregisters() {
+        Participant attendee = PARTICIPANTS.get(0);
+        Participant waiting = PARTICIPANTS.get(1);
+
+        // One slot, so the second registration lands on the waitlist
+        given().contentType(ContentType.URLENC)
+            .formParams("eventId", EVENT_ID, "name", attendee.getName(), "email", attendee.getEmail(), "limit", 1)
+            .post("/registration/" + TENANT)
+            .then().statusCode(200);
+        given().contentType(ContentType.URLENC)
+            .formParams("eventId", EVENT_ID, "name", waiting.getName(), "email", waiting.getEmail(), "limit", 1)
+            .post("/registration/" + TENANT)
+            .then().statusCode(200)
+            .body(containsString("auf die Warteliste gesetzt"));
+
+        awaitTotalMails(2);
+
+        // The attendee frees the slot, which promotes the waiting participant
+        given().contentType(ContentType.URLENC)
+            .formParams("eventId", EVENT_ID, "email", attendee.getEmail())
+            .post("/registration/" + TENANT + "/delete")
+            .then().statusCode(200)
+            .body("html.body.h3", equalTo("Vielen Dank, " + attendee.getName()));
+
+        List<Mail> mails = awaitMailsTo(waiting.getEmail(), 2);
+        assertThat(mails.get(1).getSubject()).contains("Dein Wartelisten-Eintrag");
+        assertThat(mails.get(1).getHtml()).contains("von der Warteliste auf die reguläre Teilnehmerliste");
+        assertThat(mailbox.getTotalMessagesSent()).isEqualTo(3);
+    }
+
+    @Test
     void testGetRegistrationForm() {
         given()
             .queryParam("eventId", EVENT_ID)
@@ -93,7 +122,7 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
             .getString("html.body.p[2].a");
         String registrationId = link.substring(link.indexOf("?id=") + 4);
 
-        assertTrue(mailbox.getTotalMessagesSent() > 0);
+        awaitTotalMails(1);
 
         given()
             .queryParam("id", registrationId)
@@ -121,7 +150,7 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
             .getString("html.body.p[2].a");
         String registrationId = link.substring(link.indexOf("?id=") + 4);
 
-        assertEquals(1, mailbox.getTotalMessagesSent());
+        awaitTotalMails(1);
 
         given()
             .queryParam("id", registrationId)
@@ -146,7 +175,7 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
             .body("html.body.h3", equalTo("Vielen Dank, " + participant.getName()));
 
 
-        assertEquals(1, mailbox.getTotalMessagesSent());
+        awaitTotalMails(1);
 
         // test if the deletion form returns
         given()

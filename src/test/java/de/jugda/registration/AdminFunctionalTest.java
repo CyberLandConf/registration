@@ -1,5 +1,6 @@
 package de.jugda.registration;
 
+import io.quarkus.mailer.Mail;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
@@ -7,10 +8,13 @@ import org.eclipse.microprofile.config.ConfigProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Niko Köbler, https://www.n-k.de, @dasniko
@@ -68,6 +72,37 @@ public class AdminFunctionalTest extends FunctionalTestBase {
             .put("/admin/" + TENANT + "/events/{eventId}/message")
             .then()
             .statusCode(204);
+    }
+
+    // With real recipients the mails go out in one batched send per chunk, not one at a time
+    @Test
+    void testBulkEmailReachesEverySelectedParticipant() {
+        List<String> registrationIds = given().accept(ContentType.JSON)
+            .pathParam("eventId", EVENT_ID)
+            .get("/admin/" + TENANT + "/events/{eventId}")
+            .then().statusCode(200)
+            .extract().jsonPath().getList("id", String.class);
+        assertThat(registrationIds).hasSameSizeAs(PARTICIPANTS);
+
+        String recipient = PARTICIPANTS.get(0).getEmail();
+        int before = mailbox.getMailsSentTo(recipient).size();
+
+        given().contentType(ContentType.JSON)
+            .pathParam("eventId", EVENT_ID)
+            .body("{\"subject\" : \"Rundmail {tenant.name}\", \"message\" : \"Hallo {name}\", \"registrationIds\" : "
+                + registrationIds.stream().collect(java.util.stream.Collectors.joining("\",\"", "[\"", "\"]")) + "}")
+            .put("/admin/" + TENANT + "/events/{eventId}/message")
+            .then()
+            .statusCode(204);
+
+        // The bulk send is synchronous, so the mails are in the box once the response is back
+        List<Mail> mails = mailbox.getMailsSentTo(recipient);
+        assertThat(mails).hasSize(before + 1);
+        Mail bulk = mails.get(mails.size() - 1);
+        assertThat(bulk.getSubject()).isEqualTo("Rundmail Test-JUG");
+        assertThat(bulk.getHtml()).contains("Hallo " + PARTICIPANTS.get(0).getName());
+        PARTICIPANTS.forEach(participant ->
+            assertThat(mailbox.getMailsSentTo(participant.getEmail())).isNotEmpty());
     }
 
     @Test
