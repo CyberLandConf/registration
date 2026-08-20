@@ -50,11 +50,14 @@ Known tenants (seeded in `V3__tenant.sql`): `test`, `jugda`, `cyberland`.
 |---|---|---|
 | `GET /registration/{tenant}` | anonymous | Show registration form |
 | `POST /registration/{tenant}` | anonymous | Submit registration |
-| `GET/POST /delete/{tenant}` | anonymous | Self-service deregistration |
-| `GET /calendar/{tenant}/{eventId}` | anonymous | Download `.ics` calendar file |
+| `GET/POST /registration/{tenant}/delete` | anonymous | Self-service deregistration |
+| `DELETE /registration/{tenant}/delete?id=` | anonymous | Delete one registration by UUID (used by the admin UI and the mail link) |
+| `GET /registration/{tenant}/ical/{eventId}` | anonymous | Download `.ics` calendar file |
 | `GET /webinar/{tenant}/{eventId}` | anonymous | Webinar landing page (today-only in prod) |
 | `GET /admin/{tenant}/events` | OIDC | Admin overview of all events |
-| `GET /admin/{tenant}/events/{eventId}` | OIDC | List registrations for one event |
+| `GET /admin/{tenant}/events/{eventId}` | OIDC | List registrations for one event (HTML, or JSON with `Accept: application/json`) |
+| `GET/POST /admin/{tenant}/data` | OIDC | View and edit the tenant's master data |
+| `GET /admin/{tenant}/logs` | OIDC + role `admin` | Tail the server log |
 | `PUT /admin/{tenant}/events/{eventId}/data` | OIDC | Update event metadata |
 | `PUT /admin/{tenant}/events/{eventId}/message` | OIDC | Send bulk email to participants |
 

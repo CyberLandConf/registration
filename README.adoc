@@ -5,6 +5,10 @@ https://quarkus.io[Quarkus]-based application.
 
 == Usage / Integration Configuration
 
+TIP: Ein ausführliches deutschsprachiges Handbuch für JUG-Orga-Teams -- Einbindung in die
+eigene Website, Events-Datei, E-Mails und Admin-Bereich -- steht in
+link:docs/handbuch.adoc[docs/handbuch.adoc].
+
 Should be embedded in an `<iframe>` on the page.
 
 Root page is `/registration/{tenant}?eventId=...`.
