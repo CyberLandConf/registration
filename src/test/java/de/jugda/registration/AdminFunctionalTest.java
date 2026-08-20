@@ -105,6 +105,24 @@ public class AdminFunctionalTest extends FunctionalTestBase {
             assertThat(mailbox.getMailsSentTo(participant.getEmail())).isNotEmpty());
     }
 
+    // The "Zum Online-Meeting" button needs the tenant in its path, otherwise it 404s
+    @Test
+    void testEventRegistrationsLinkToWebinarPageOfThisTenant() {
+        given().contentType(ContentType.JSON)
+            .pathParam("eventId", EVENT_ID)
+            .body("{\"webinarLink\" : \"https://example.com/webinar\"}")
+            .put("/admin/" + TENANT + "/events/{eventId}/data")
+            .then().statusCode(204);
+
+        given().accept(ContentType.HTML)
+            .pathParam("eventId", EVENT_ID)
+            .get("/admin/" + TENANT + "/events/{eventId}")
+            .then()
+            .statusCode(200)
+            .body(containsString("href=\"/webinar/" + TENANT + "/" + EVENT_ID + "\""))
+        ;
+    }
+
     @Test
     void testWebinarPage() {
         given()

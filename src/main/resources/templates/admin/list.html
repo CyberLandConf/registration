@@ -7,7 +7,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <h2 class="fw-light my-3">Anmeldungen für Event am {event.startDate ?: 'eventStartDate‚∑'}: {registrations.size}</h2>
                 {#if eventData.get('webinarLink')??}
-                <a href="/webinar/{eventId}" target="_blank" class="btn btn-primary">Zum Online-Meeting</a>
+                <a href="/webinar/{tenant.id}/{eventId}" target="_blank" class="btn btn-primary">Zum Online-Meeting</a>
                 {/if}
             </div>
             <h3 class="fw-light my-3"><a href="{event.url ?: '#'}" target="_blank">{event.summary ?: 'eventSummary'}</a></h3>
