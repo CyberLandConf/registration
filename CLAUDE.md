@@ -128,6 +128,27 @@ Exceptions asynchroner Observer landen in einem `CompletionStage`, den niemand a
 loggt `onRegistrationEvent()` selbst. Folge: Ein fehlgeschlagener Mailversand rollt die Transaktion
 nicht mehr zurueck, der Nutzer sieht trotzdem die Danke-Seite.
 
+Damit das nicht unsichtbar bleibt, traegt `registration.confirmationSentAt` den Zustand:
+
+- `null` heisst *Mail steht noch aus* -- gesetzt beim Anlegen/Aktualisieren einer Anmeldung
+  (`RegistrationService.handleRegistration`) und beim Nachruecken von der Warteliste
+  (`DeleteService.processWaitlist`).
+- Der Zeitstempel wird erst nach einem Versand ohne Exception gesetzt, per
+  `RegistrationService.markConfirmationSent(...)`. Das muss ein **eigener Bean-Aufruf** sein, sonst
+  greift der `@Transactional`-Interceptor nicht (Self-Invocation), und auf dem Worker-Thread laeuft
+  ohnehin keine Transaktion.
+- `admin/list.html` zeigt pro Zeile ein Icon: gruenes Kuvert mit Zeitstempel, sonst rotes Kuvert.
+  Ein kurzes Rot direkt nach der Anmeldung ist normal -- der Versand laeuft asynchron.
+
+Die Migration `V7` fuellt Bestandszeilen mit `created` auf: frueher hing der Versand in der
+Transaktion, eine persistierte Zeile impliziert also eine zugestellte Mail. Ohne das Backfill waere
+nach dem Deploy jede Altanmeldung rot.
+
+Test-Fallstrick: Assertions, die die DB lesen, brauchen `pollInSameThread()`. Awaitility pollt sonst
+auf einem eigenen Thread, und der `CurrentTenantResolver` ist `@RequestScoped` -- die Query stirbt mit
+*no tenant identifier specified*. Mailbox-Assertions sind davon nicht betroffen (`MockMailbox` ist ein
+Singleton).
+
 Die Rundmail (`EmailService.sendBulkEmail`, Admin-UI) laeuft weiterhin synchron im Request -- sie hat
 kein Transaktions-Problem und der Admin will das Ergebnis sofort sehen. Sie verschickt pro 50er-Chunk
 (gebildet in `AdminEventsResource.sendMessage`) *einen* `mailer.send(Mail...)`-Aufruf, den der Mailer

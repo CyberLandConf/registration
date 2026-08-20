@@ -27,11 +27,18 @@ public class RegistrationDto {
     public boolean videoRecording;
     public boolean remote;
     public LocalDateTime created;
+    public LocalDateTime confirmationSentAt;
     public Long ttl;
 
     // needed by template
     public String formattedCreationDate() {
         return created.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+    }
+
+    // needed by template
+    public String formattedConfirmationSentAt() {
+        return confirmationSentAt == null
+            ? "" : confirmationSentAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
 }

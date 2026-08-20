@@ -11,6 +11,9 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.UriInfo;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @ApplicationScoped
 public class RegistrationService {
 
@@ -20,6 +23,19 @@ public class RegistrationService {
     TenantContext tenantCtx;
     @Inject
     UriInfo uriInfo;
+
+    /**
+     * Records that the participant mail for this registration actually went out. Called from the
+     * asynchronous observer in {@link EmailService}, where no transaction is running - hence a
+     * separate bean, so the interceptor applies.
+     */
+    @Transactional
+    public void markConfirmationSent(String registrationId) {
+        Registration registration = Registration.findById(UUID.fromString(registrationId));
+        if (registration != null) {
+            registration.setConfirmationSentAt(LocalDateTime.now());
+        }
+    }
 
     public long getRegistrationCount(String eventId) {
         return Registration.count("eventId", eventId);
@@ -34,6 +50,9 @@ public class RegistrationService {
             boolean waitlist = getRegistrationCount(form.getEventId()) >= limit;
             registration = Registration.of(form, waitlist);
         }
+        // Pending until the mail actually goes out - also on re-registration, where a stale
+        // timestamp would otherwise vouch for a mail that is only about to be sent.
+        registration.setConfirmationSentAt(null);
         registration.persist();
 
         RegistrationDto dto = registration.toDto();

@@ -39,6 +39,8 @@ public class Registration extends PanacheEntityBase {
     private boolean videoRecording;
     private boolean remote;
     private LocalDateTime created;
+    /** When the participant mail for the current state was successfully sent; null = still owed one. */
+    private LocalDateTime confirmationSentAt;
     private Long ttl;
 
     public static Registration of(RegistrationForm form, boolean waitlist) {
@@ -71,6 +73,7 @@ public class Registration extends PanacheEntityBase {
         dto.setVideoRecording(this.videoRecording);
         dto.setRemote(this.remote);
         dto.setCreated(this.created);
+        dto.setConfirmationSentAt(this.confirmationSentAt);
         dto.setTtl(this.ttl);
         return dto;
     }

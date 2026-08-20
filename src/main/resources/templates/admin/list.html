@@ -24,6 +24,7 @@
                     <th>Remote</th>
                     <th>Warteliste</th>
                     <th>Datum (UTC)</th>
+                    <th>Mail</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -46,6 +47,13 @@
                         {#if reg.waitlist}<i class="bi bi-hourglass-split"></i>{/if}
                     </td>
                     <td>{reg.formattedCreationDate}</td>
+                    <td>
+                        {#if reg.confirmationSentAt != null}
+                        <i class="bi bi-envelope-check text-success" title="Mail verschickt: {reg.formattedConfirmationSentAt}"></i>
+                        {#else}
+                        <i class="bi bi-envelope-exclamation text-danger" title="Noch keine Mail zugestellt - Versand laeuft noch oder ist fehlgeschlagen"></i>
+                        {/if}
+                    </td>
                     <td>
                         <div onclick="delReg('{reg.id}', '{reg.name}')" style="cursor: pointer">
                             <i class="bi bi-trash"></i>

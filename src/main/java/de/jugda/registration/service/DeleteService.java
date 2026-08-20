@@ -58,6 +58,8 @@ public class DeleteService {
             .<Registration>firstResultOptional()
             .ifPresent(waiter -> {
                 waiter.setWaitlist(false);
+                // The promotion mail is owed again - keep a stale confirmation from vouching for it
+                waiter.setConfirmationSentAt(null);
                 waiter.persist();
                 // Delivered only after this transaction commits - see EmailService.
                 waitlistPromoted.fire(new WaitlistPromoted(tenantCtx.getTenantId(), uriInfo.getBaseUri(), waiter.toDto()));

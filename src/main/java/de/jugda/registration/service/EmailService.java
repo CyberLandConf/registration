@@ -42,6 +42,8 @@ public class EmailService {
     UriInfo uriInfo;
     @Inject
     Event<RegistrationEvent> registrationEvents;
+    @Inject
+    RegistrationService registrationService;
 
     /**
      * Runs on the request thread, but only once the triggering transaction has committed, so no mail
@@ -67,6 +69,7 @@ public class EmailService {
         try {
             tenantCtx.setTenantId(event.tenantId());
             sendParticipantMail(event);
+            registrationService.markConfirmationSent(event.registration().id);
         } catch (Exception e) {
             Log.errorf(e, "Could not send %s mail for event %s to registration %s",
                 event.getClass().getSimpleName(), event.registration().eventId, event.registration().id);

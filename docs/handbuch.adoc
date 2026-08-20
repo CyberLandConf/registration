@@ -460,6 +460,9 @@ Geht automatisch nach jeder Anmeldung raus und enthält:
   in Google Kalender
 * den persönlichen Abmeldelink
 
+Ob sie tatsächlich rausgegangen ist, steht in der Teilnehmerliste in der Spalte *Mail* –
+siehe <<_teilnehmerliste_eines_events>>.
+
 === Nachrück-Benachrichtigung
 
 Geht automatisch an die Person, die von der Warteliste auf die Teilnehmerliste nachgerückt
@@ -560,9 +563,24 @@ Die Tabelle zeigt pro Anmeldung:
 |Datum (UTC)
 |Zeitpunkt der Anmeldung. *In UTC*, im Sommer also zwei Stunden vor der lokalen Zeit.
 
+|Mail
+|Ob die E-Mail an diesen Teilnehmer rausgegangen ist. Grünes Kuvert: zugestellt – der
+Zeitpunkt steht in der Sprechblase, wenn man mit der Maus darüber geht. Rotes Kuvert: noch
+nicht zugestellt.
+
 |Papierkorb-Symbol
 |Anmeldung löschen, mit Sicherheitsabfrage.
 |===
+
+[TIP]
+====
+Ein *rotes Kuvert direkt nach einer Anmeldung ist normal*: Der Versand läuft im Hintergrund,
+ein kurzes Neuladen der Seite später steht das Kuvert auf Grün.
+
+Bleibt es rot, ist die Mail wirklich nicht rausgegangen – dann hilft nur, die Person auf
+anderem Weg zu erreichen. Auch nach dem Nachrücken von der Warteliste springt das Kuvert
+kurz auf Rot, bis die Nachrück-Benachrichtigung zugestellt ist.
+====
 
 Beim Löschen eines regulären Teilnehmers rückt automatisch die erste Person von der
 Warteliste nach und wird benachrichtigt – genau wie bei einer Abmeldung durch den
@@ -778,6 +796,7 @@ gleich das automatische Mitwachsen einbauen.
 Listener zeigt, ob überhaupt Nachrichten ankommen.
 
 |Die Bestätigungsmail kommt nicht sofort
-|Der Versand läuft im Hintergrund, ein paar Sekunden Verzögerung sind normal. Kommt gar
-nichts an, hilft ein Blick in die Logs.
+|Der Versand läuft im Hintergrund, ein paar Sekunden Verzögerung sind normal. Ob sie raus
+ist, zeigt die Spalte *Mail* in der Teilnehmerliste: Grün heißt zugestellt. Bleibt das
+Kuvert rot, ist der Versand fehlgeschlagen – Details stehen dann in den Logs.
 |===

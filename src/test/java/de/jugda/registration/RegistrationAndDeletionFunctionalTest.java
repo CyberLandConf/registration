@@ -9,10 +9,13 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -30,6 +33,14 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
     void cleanup(){
         mailbox.clear();
         em.createNativeQuery("DELETE FROM registration").executeUpdate();
+    }
+
+    @Transactional
+    LocalDateTime confirmationSentAt(String email) {
+        return (LocalDateTime) em.createNativeQuery(
+                "SELECT confirmationSentAt FROM registration WHERE email = ?1")
+            .setParameter(1, email)
+            .getSingleResult();
     }
 
     @Test
@@ -89,6 +100,14 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
         assertThat(mails.get(1).getSubject()).contains("Dein Wartelisten-Eintrag");
         assertThat(mails.get(1).getHtml()).contains("von der Warteliste auf die reguläre Teilnehmerliste");
         assertThat(mailbox.getTotalMessagesSent()).isEqualTo(3);
+
+        // The promotion cleared the stamp and the delivered mail set it again
+        // pollInSameThread: the tenant resolver is request-scoped, and Awaitility's own poll
+        // thread has no request context - the query would fail with "no tenant identifier".
+        await("the promotion to be stamped on the row")
+            .atMost(Duration.ofSeconds(10))
+            .pollInSameThread()
+            .untilAsserted(() -> assertThat(confirmationSentAt(waiting.getEmail())).isNotNull());
     }
 
     // Der Nachrichtentyp ist der Vertrag mit den einbettenden JUG-Seiten (docs/handbuch.adoc)

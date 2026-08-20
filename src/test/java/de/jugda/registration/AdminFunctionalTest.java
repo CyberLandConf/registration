@@ -14,6 +14,8 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.awaitility.Awaitility.await;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -103,6 +105,32 @@ public class AdminFunctionalTest extends FunctionalTestBase {
         assertThat(bulk.getHtml()).contains("Hallo " + PARTICIPANTS.get(0).getName());
         PARTICIPANTS.forEach(participant ->
             assertThat(mailbox.getMailsSentTo(participant.getEmail())).isNotEmpty());
+    }
+
+    // A mail that never went out must be visible where the orga team already looks
+    @Test
+    void testParticipantListShowsWhetherTheConfirmationMailWentOut() {
+        String email = PARTICIPANTS.get(0).getEmail();
+        await("confirmation stamp for " + email)
+            .atMost(java.time.Duration.ofSeconds(10))
+            .untilAsserted(() -> assertThat(confirmationSentAt(email)).isNotNull());
+
+        given().accept(ContentType.HTML)
+            .pathParam("eventId", EVENT_ID)
+            .get("/admin/" + TENANT + "/events/{eventId}")
+            .then()
+            .statusCode(200)
+            .body(containsString("bi-envelope-check"))
+            .body(not(containsString("bi-envelope-exclamation")));
+    }
+
+    private static String confirmationSentAt(String email) {
+        return given().accept(ContentType.JSON)
+            .pathParam("eventId", EVENT_ID)
+            .get("/admin/" + TENANT + "/events/{eventId}")
+            .then().statusCode(200)
+            .extract().jsonPath()
+            .getString("find { it.email == '" + email + "' }.confirmationSentAt");
     }
 
     // The "Zum Online-Meeting" button needs the tenant in its path, otherwise it 404s
