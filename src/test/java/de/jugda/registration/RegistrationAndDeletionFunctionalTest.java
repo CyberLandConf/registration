@@ -91,6 +91,20 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
         assertThat(mailbox.getTotalMessagesSent()).isEqualTo(3);
     }
 
+    // Der Nachrichtentyp ist der Vertrag mit den einbettenden JUG-Seiten (docs/handbuch.adoc)
+    @Test
+    void testEmbeddedPagesReportTheirHeightToTheHostPage() {
+        given()
+            .queryParam("eventId", EVENT_ID)
+            .queryParam("deadline", EVENT_ID + "T23:59:59+02:00")
+            .queryParam("opensBeforeInMonths", 12)
+            .get("/registration/" + TENANT)
+            .then()
+            .statusCode(200)
+            .body(containsString("window.parent.postMessage"))
+            .body(containsString("ijug-registration:height"));
+    }
+
     @Test
     void testGetRegistrationForm() {
         given()

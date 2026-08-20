@@ -13,5 +13,33 @@
     <script src="/webjars/jquery/jquery.min.js"></script>
     <script src="/webjars/bootstrap/js/bootstrap.bundle.min.js"></script>
     {#insert scripts}{/}
+    <script>
+        {|
+        // Qute-Rohblock: das JS-Objektliteral unten sieht sonst wie ein Qute-Ausdruck aus.
+        // Meldet die Inhaltshoehe an die einbettende Seite, damit deren <iframe> mitwachsen
+        // kann. Die Gegenstelle ist optional - ohne Listener bleibt es bei der fest
+        // eingestellten Hoehe. Siehe docs/handbuch.adoc.
+        (function () {
+            if (window.parent === window) return; // nicht eingebettet
+
+            var last = -1;
+            // Der ResizeObserver liefert den ersten Wert von sich aus und meldet auch spaeter
+            // nachgeladene Bilder und Webfonts - ein zusaetzlicher load-Handler waere doppelt.
+            // Er feuert allerdings auch bei reinen Breitenaenderungen, daher der last-Vergleich.
+            new ResizeObserver(function () {
+                // Bewusst die Hoehe des <body> und nicht die des Dokuments: die Dokumenthoehe
+                // waechst auf mindestens die Viewport-Hoehe mit, wodurch das iframe nach einer
+                // Vergroesserung nie wieder schrumpfen koennte. Body-Margins spart Bootstrap
+                // (Reboot setzt margin:0), deshalb reicht die reine Box-Hoehe.
+                var height = Math.ceil(document.body.getBoundingClientRect().height);
+                if (height === last) return;
+                last = height;
+                // Ziel-Origin ist unbekannt (beliebige JUG-Seite), die Herkunftspruefung macht
+                // deshalb der Empfaenger - siehe Snippet in docs/handbuch.adoc.
+                window.parent.postMessage({type: 'ijug-registration:height', height: height}, '*');
+            }).observe(document.body);
+        })();
+        |}
+    </script>
 </body>
 </html>

@@ -139,16 +139,70 @@ Tag teilen sich sonst dieselbe Teilnehmerliste.
 
 === Die Höhe des iframes
 
-Die App meldet ihre Höhe *nicht* automatisch an die umgebende Seite – ein `<iframe>`
-kann nicht von sich aus mitwachsen. Die Höhe muss deshalb fest gesetzt werden.
+Ein `<iframe>` wächst nicht von allein mit seinem Inhalt mit, und die umgebende Seite darf
+die Höhe des Inhalts auch nicht einfach auslesen – das verbietet der Browser, weil die
+Anmelde-App auf einer anderen Domain liegt als die JUG-Website.
 
-Als Ausgangspunkt haben sich rund `850` Pixel bewährt. Der tatsächliche Bedarf hängt davon
-ab, wie viele Optionen aktiviert sind (jede zusätzliche Checkbox kostet Platz) und wie lang
-die eigenen Hilfetexte sind. Zu prüfen ist das am besten einmal am Desktop und einmal auf
-dem Handy, wo die Texte deutlich mehr Zeilen umbrechen.
+Deshalb gilt zunächst die im `height`-Attribut eingetragene feste Höhe. Als Ausgangspunkt
+haben sich rund `850` Pixel bewährt. Der tatsächliche Bedarf hängt davon ab, wie viele
+Optionen aktiviert sind (jede zusätzliche Checkbox kostet Platz) und wie lang die eigenen
+Hilfetexte sind. Zu prüfen ist das am besten einmal am Desktop und einmal auf dem Handy, wo
+die Texte deutlich mehr Zeilen umbrechen.
 
 TIP: Lieber etwas zu großzügig als zu knapp: Ist das iframe zu niedrig, bekommt es eine
 eigene Scrollleiste, was auf Mobilgeräten unangenehm zu bedienen ist.
+
+==== Automatisch mitwachsen lassen
+
+Wer die feste Höhe loswerden möchte, kann das iframe automatisch nachführen lassen. Die App
+schickt ihre Inhaltshöhe von sich aus nach außen – es fehlt nur noch ein kleiner
+Empfänger auf der eigenen Seite:
+
+[source,html]
+----
+<iframe id="anmeldung"
+    src="https://registration.ijug.eu/registration/jugda?eventId=2026-11-19"
+    title="Anmeldung zur Veranstaltung"
+    width="100%"
+    height="850"
+    style="border: 0;"
+    loading="lazy">
+</iframe>
+
+<script>
+  window.addEventListener('message', function (event) {
+    if (event.origin !== 'https://registration.ijug.eu') return;
+    if (!event.data || event.data.type !== 'ijug-registration:height') return;
+    document.getElementById('anmeldung').style.height = event.data.height + 'px';
+  });
+</script>
+----
+
+Das war's. Die Höhe wird beim Laden gesetzt und danach bei jeder Änderung nachgeführt –
+etwa wenn eine Fehlermeldung erscheint oder die Danke-Seite angezeigt wird.
+
+[IMPORTANT]
+.Die Herkunftsprüfung nicht weglassen
+====
+Die Zeile mit `event.origin` ist kein Beiwerk. Ohne sie kann *jede beliebige* Seite, die
+irgendwo im Spiel ist, Nachrichten schicken und die Höhe des iframes manipulieren. Sie
+gehört genau so in den Code.
+====
+
+TIP: Das `height`-Attribut bitte trotzdem stehen lassen. Es ist die Höhe, die bis zur
+ersten Meldung gilt, und die Rückfallebene, falls jemand JavaScript abgeschaltet hat.
+
+Wer *mehrere* Anmeldeformulare auf einer Seite einbettet, unterscheidet sie über den
+Absender der Nachricht, statt eine feste ID zu verwenden:
+
+[source,js]
+----
+document.querySelectorAll('iframe').forEach(function (frame) {
+  if (frame.contentWindow === event.source) {
+    frame.style.height = event.data.height + 'px';
+  }
+});
+----
 
 === Alle Parameter im Überblick
 
@@ -715,7 +769,13 @@ mit dem Datum überein, siehe <<_die_events_datei>>.
 die Veranstaltung steht nicht in der Events-Datei.
 
 |Das eingebettete Formular hat eine eigene Scrollleiste
-|Die Höhe des `<iframe>` reicht nicht. Wert erhöhen und auf dem Handy gegenprüfen.
+|Die Höhe des `<iframe>` reicht nicht. Wert erhöhen und auf dem Handy gegenprüfen – oder
+gleich das automatische Mitwachsen einbauen.
+
+|Das automatische Mitwachsen tut nichts
+|Meist stimmt die Adresse in der `event.origin`-Prüfung nicht exakt mit der Adresse der App
+überein (Tippfehler, `http` statt `https`, Schrägstrich am Ende). Ein `console.log` im
+Listener zeigt, ob überhaupt Nachrichten ankommen.
 
 |Die Bestätigungsmail kommt nicht sofort
 |Der Versand läuft im Hintergrund, ein paar Sekunden Verzögerung sind normal. Kommt gar

@@ -81,6 +81,14 @@ Qute HTML templates in `src/main/resources/templates/`. Mail templates are in `t
 
 **Seiten-Scripts gehoeren in den `{#scripts}`-Block, nicht in `{#body}`.** `template.html` laedt jQuery und Bootstrap am Ende von `<body>` und stellt danach einen `{#insert scripts}{/}`-Slot bereit. Ein `<script>` innerhalb von `{#body}` wird vor den Lib-Tags gerendert und laeuft damit, bevor `$` existiert -- ohne sichtbaren Fehler, die Seite bleibt einfach tot.
 
+**Inline-JS mit Objektliteralen braucht einen Qute-Rohblock `{|` ... `|}`.** Qute parst
+`{` als Ausdrucksbeginn, sobald direkt ein Bezeichner folgt. Ein JS-Objektliteral wie
+`{type: 'x', height: h}` wird deshalb als Ausdruck interpretiert und die Seite stirbt zur
+Laufzeit mit `No namespace resolver found for [type]`. Vorhandenes Inline-JS in
+`admin/list.html` funktioniert nur, weil dort nach jeder `{` ein Umbruch folgt -- das ist
+Zufall, kein Schutz. Der Hoehen-Reporter in `template.html` ist entsprechend in `{|` ... `|}`
+gekapselt.
+
 `async`/`defer` sind auf den Lib-Tags bewusst nicht gesetzt: `defer` wirkt nicht auf Inline-Scripts, ein deferter jQuery-Tag wuerde die Slot-Scripts also weiterhin ueberholen. Wer `defer` will, muss alle Slot-Scripts in `DOMContentLoaded` kapseln.
 
 ### Database Migrations
@@ -132,6 +140,19 @@ zwingend da. `FunctionalTestBase.awaitTotalMails(n)` / `awaitMailsTo(mail, n)` p
 (`untilAsserted`) darauf, statt direkt zu assertieren -- ein Timeout meldet dadurch die tatsaechlich
 gezaehlten Mails (`expected: 2 but was: 1`) und nicht nur, dass die Wartezeit abgelaufen ist.
 Die `MockMailbox` haengt in `FunctionalTestBase`, beide Test-Klassen nutzen sie.
+
+### iframe-Auto-Hoehe
+
+`template.html` enthaelt am Ende einen Hoehen-Reporter: Ist die Seite eingebettet
+(`window.parent !== window`), meldet ein `ResizeObserver` die Inhaltshoehe per
+`postMessage` als `{type: 'ijug-registration:height', height: <px>}` an die einbettende
+Seite. Der Nachrichtentyp ist ein **oeffentlicher Vertrag** mit den JUG-Websites (Snippet in
+`docs/handbuch.adoc`) -- Umbenennen bricht deren Integration still. Ein Test in
+`RegistrationAndDeletionFunctionalTest` haelt ihn fest.
+
+Gemessen wird bewusst `document.body` und nicht `documentElement`: Die Dokumenthoehe waechst
+auf mindestens die Viewport-Hoehe mit, wodurch das iframe nach einer Vergroesserung nie
+wieder schrumpfen koennte (Rueckkopplung).
 
 ### CORS
 `quarkus.http.cors.methods` in `application.properties` muss alle Methoden enthalten, die das Frontend nutzt -- aktuell `GET,POST,PUT,DELETE,OPTIONS`. Der CORS-Filter laeuft **vor** Authentifizierung und Routing: eine fehlende Methode wird mit einem **403 ohne Body** abgewiesen, was wie ein Rechteproblem aussieht, aber keines ist. Bis 2026-08-19 fehlten hier `PUT` und `DELETE`, wodurch saemtliche schreibenden Admin-Funktionen (Event-Daten speichern, Rundmail, Anmeldung loeschen) im Browser stumm fehlschlugen.
