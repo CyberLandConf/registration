@@ -197,6 +197,15 @@ wieder schrumpfen koennte (Rueckkopplung).
 - Client ID: `registration`
 - Roles are sourced from the access token at `resource_access/registration/roles`
 - A role named exactly like the tenant ID grants admin access to that tenant
+- `admin/menu.html` binds `{#let nav=activeNav.or('')}` around the nav list. Qute renders strictly: a page
+  that simply omits `activeNav` from its template data would fail with a 500, not a blank highlight. The
+  binding lets the operator pages, which highlight no nav entry, leave it out.
+- The two operator-only pages (*Neue JUG*, *Server-Logs*) live in the user dropdown at the bottom of
+  `admin/menu.html`, wrapped in `{#if inject:currentUser.admin}`; the nav list above holds only the pages every
+  orga team uses.
+  `CurrentUser` is a `@Named @RequestScoped` bean; Qute resolves `inject:` namespace expressions against
+  `@Named` beans and validates them at build time, which keeps the flag out of every single resource method.
+  The endpoints stay guarded by `@RolesAllowed` — the hidden link is a courtesy, not a permission check.
 - Dev mode uses a local Keycloak DevService with `ijug-realm.json`
 
 ### Production Deployment

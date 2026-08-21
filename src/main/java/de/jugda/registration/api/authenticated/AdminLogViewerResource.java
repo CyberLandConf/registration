@@ -42,8 +42,7 @@ public class AdminLogViewerResource {
     public TemplateInstance logsPage() {
         return logsTemplate
             .data("tenant", tenantCtx.getTenant())
-            .data("id", idToken)
-            .data("activeNav", "logs");
+            .data("id", idToken);
     }
 
     @GET

@@ -73,7 +73,6 @@ public class AdminTenantProvisioningResource {
         return tenants
             .data("tenant", tenantCtx.getTenant())
             .data("id", idToken)
-            .data("activeNav", "tenants")
             .data("templateTenant", TenantProvisioningService.TEMPLATE_TENANT)
             .data("newTenantId", id)
             .data("newTenantName", name)

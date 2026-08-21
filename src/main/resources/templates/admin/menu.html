@@ -5,38 +5,28 @@
         <span class="fs-4">{tenant.name}</span> </a>
     </div>
     <hr>
+    {#let nav=activeNav.or('')}
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="./events" class="nav-link {#if activeNav == 'events'}active{#else}link-body-emphasis{/if}" {#if activeNav == 'events'}aria-current="page"{/if}>
+            <a href="./events" class="nav-link {#if nav == 'events'}active{#else}link-body-emphasis{/if}" {#if nav == 'events'}aria-current="page"{/if}>
                 <i class="bi bi-calendar-event me-1"></i>
                 Events / Registrierungen
             </a>
         </li>
         <li>
-            <a href="./data" class="nav-link {#if activeNav == 'data'}active{#else}link-body-emphasis{/if}" {#if activeNav == 'data'}aria-current="page"{/if}>
+            <a href="./data" class="nav-link {#if nav == 'data'}active{#else}link-body-emphasis{/if}" {#if nav == 'data'}aria-current="page"{/if}>
                 <i class="bi bi-database me-1"></i>
                 JUG Data
             </a>
         </li>
         <li>
-            <a href="./content" class="nav-link {#if activeNav == 'content'}active{#else}link-body-emphasis{/if}" {#if activeNav == 'content'}aria-current="page"{/if}>
+            <a href="./content" class="nav-link {#if nav == 'content'}active{#else}link-body-emphasis{/if}" {#if nav == 'content'}aria-current="page"{/if}>
                 <i class="bi bi-card-text me-1"></i>
                 Texte
             </a>
         </li>
-        <li>
-            <a href="./tenants" class="nav-link {#if activeNav == 'tenants'}active{#else}link-body-emphasis{/if}" {#if activeNav == 'tenants'}aria-current="page"{/if}>
-                <i class="bi bi-plus-circle me-1"></i>
-                Neue JUG
-            </a>
-        </li>
-        <li>
-            <a href="./logs" class="nav-link {#if activeNav == 'logs'}active{#else}link-body-emphasis{/if}" {#if activeNav == 'logs'}aria-current="page"{/if}>
-                <i class="bi bi-file-text me-1"></i>
-                Logs
-            </a>
-        </li>
     </ul>
+    {/let}
     <hr>
     <div class="dropdown">
         <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle"
@@ -45,8 +35,21 @@
             <strong>{id.getClaim('name')}</strong>
         </a>
         <ul class="dropdown-menu text-small shadow">
-            <li><a class="dropdown-item" href="#">Platzhalter...</a></li>
+            {#if inject:currentUser.admin}
+            <li>
+                <a class="dropdown-item" href="./tenants">
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Neue JUG
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="./logs">
+                    <i class="bi bi-file-text me-1"></i>
+                    Server-Logs
+                </a>
+            </li>
             <li><hr class="dropdown-divider"></li>
+            {/if}
             <li><a class="dropdown-item" href="/logout">Logout</a></li>
         </ul>
     </div>

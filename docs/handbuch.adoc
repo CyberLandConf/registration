@@ -517,13 +517,17 @@ tenant" zu sehen. Dann fehlt die passende Rolle im Keycloak.
 
 === Navigation
 
-Links steht eine Leiste mit Logo und Namen der JUG und fünf Einträgen:
+Links steht eine Leiste mit Logo und Namen der JUG und den drei Einträgen für die tägliche
+Arbeit:
 
 * *Events / Registrierungen* – Anmeldungen ansehen und verwalten
 * *JUG Data* – Stammdaten der JUG
 * *Texte* – die Hilfetexte am Anmeldeformular und auf der Webinar-Seite
-* *Neue JUG* – eine weitere JUG anlegen (nur mit der zusätzlichen Rolle `admin`)
-* *Logs* – Serverprotokoll (nur mit der zusätzlichen Rolle `admin`)
+
+Ganz unten in der Leiste steht der eigene Name. Das Klappmenü dahinter führt zum Logout und,
+nur bei Konten mit der zusätzlichen Rolle `admin`, zu den beiden Betreiber-Seiten
+<<_neue_jug_anlegen>> und <<_logs>>. Wer diese Einträge nicht sieht, dem fehlt die Rolle – für
+die Arbeit einer JUG werden beide Seiten nicht gebraucht.
 
 === Events / Registrierungen
 
@@ -710,9 +714,10 @@ bitte weglassen.
 
 === Neue JUG anlegen
 
-Diese Seite legt eine weitere JUG in der Anwendung an. Sie ist den Betreibern vorbehalten und
-erfordert zusätzlich zur Mandantenrolle die Rolle `admin`; für die Orga-Teams der einzelnen
-JUGs ist sie gesperrt.
+Diese Seite legt eine weitere JUG in der Anwendung an. Erreichbar ist sie über das Klappmenü
+am eigenen Namen unten links in der Leiste. Sie ist den Betreibern vorbehalten und erfordert zusätzlich zur
+Mandantenrolle die Rolle `admin`; für die Orga-Teams der einzelnen JUGs ist sie gesperrt und
+taucht in deren Menü gar nicht erst auf.
 
 Einzutragen sind nur zwei Angaben:
 
@@ -742,9 +747,9 @@ Teilnehmer funktioniert dagegen sofort.
 
 === Logs
 
-Zeigt die letzten Zeilen des Serverprotokolls, standardmäßig 2000, höchstens 3000. Diese
-Seite ist der Fehlersuche vorbehalten und erfordert zusätzlich zur Mandantenrolle die Rolle
-`admin`. Für den Alltagsbetrieb wird sie nicht gebraucht.
+Zeigt die letzten Zeilen des Serverprotokolls, standardmäßig 2000, höchstens 3000. Aufgerufen
+wird sie als *Server-Logs* über dasselbe Klappmenü. Diese Seite ist der Fehlersuche vorbehalten
+und erfordert zusätzlich zur Mandantenrolle die Rolle `admin`. Für den Alltagsbetrieb wird sie nicht gebraucht.
 
 === Teilnehmerliste als JSON
 

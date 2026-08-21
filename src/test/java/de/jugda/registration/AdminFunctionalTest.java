@@ -6,8 +6,12 @@ import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.eclipse.microprofile.config.ConfigProvider;
+import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 
@@ -277,6 +281,40 @@ public class AdminFunctionalTest extends FunctionalTestBase {
 
     private static String tenantFieldOfTemplate(String field) {
         return adminPageValue("data", "**.find { it.@id == '" + field + "' }.@value");
+    }
+
+    // Links into pages the orga team may not open are only noise -- and an invitation to a 403
+    // Links into pages the orga team may not open are only noise -- and an invitation to a 403.
+    // The identity comes from @TestSecurity, which is per method, so the role is what splits these two
+    // tests while the menu entry is the parameter.
+    @ParameterizedTest
+    @CsvSource({"./events,true", "./data,true", "./content,true", "./tenants,false", "./logs,false"})
+    void testOrgaTeamsSeeTheirOwnEntriesAndNoOperatorEntries(String href, boolean visible) {
+        assertMenuEntry(href, visible);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"./events", "./data", "./content", "./tenants", "./logs"})
+    @TestSecurity(user = "root", roles = {"test", "admin"})
+    void testAdminsSeeEveryEntry(String href) {
+        assertMenuEntry(href, true);
+    }
+
+    private static void assertMenuEntry(String href, boolean visible) {
+        Matcher<String> link = containsString("href=\"" + href + "\"");
+        given().get("/admin/" + TENANT + "/events")
+            .then().statusCode(200)
+            .body(visible ? link : not(link));
+    }
+
+    // The operator pages highlight no nav entry and therefore pass no activeNav -- menu.html has to
+    // tolerate that, and a missing key in a Qute expression is a 500, not a blank
+    @Test
+    @TestSecurity(user = "root", roles = {"test", "admin"})
+    void testOperatorPagesRenderWithoutAnActiveNavEntry() {
+        given().get("/admin/" + TENANT + "/logs")
+            .then().statusCode(200)
+            .body(containsString("href=\"./events\""));
     }
 
     @Test
