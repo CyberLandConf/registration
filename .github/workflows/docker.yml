@@ -44,6 +44,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      # A tagged build has to carry the tag as its version: quarkus.application.version comes from
+      # the pom and is shown in the admin UI, so without this every release would claim to be the
+      # SNAPSHOT the pom still names. Untagged builds of main keep the SNAPSHOT version.
+      - name: Set version from tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: ./mvnw -B versions:set -DnewVersion=${GITHUB_REF_NAME#v} -DgenerateBackupPoms=false
+
       - name: Maven build
         run: ./mvnw -B -U clean package
 

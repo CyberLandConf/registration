@@ -17,6 +17,7 @@
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
     <quarkus.platform.version>3.38.2</quarkus.platform.version>
     <surefire-plugin.version>3.5.6</surefire-plugin.version>
+    <versions-plugin.version>2.21.0</versions-plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -169,6 +170,17 @@
   </dependencies>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <!-- Only invoked from the release workflow (versions:set), never bound to a phase.
+             Managed here so the workflow can use the short prefix and still get a pinned version. -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>${versions-plugin.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>${quarkus.platform.group-id}</groupId>
