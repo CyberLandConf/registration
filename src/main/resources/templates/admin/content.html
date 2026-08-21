@@ -1,0 +1,34 @@
+{#include template.html}
+{#body}
+<div class="container">
+    <div class="row">
+        {#include admin/menu.html/}
+        <div class="col">
+            <h2 class="fw-light my-3">Texte</h2>
+            <p class="text-muted">
+                Die erklärenden Texte auf dem Anmeldeformular und der Webinar-Seite. Änderungen
+                wirken sofort, eine Historie gibt es nicht.
+            </p>
+            <form method="post" action="/admin/{tenant.id}/content">
+                {#for text in texts}
+                <div class="mb-3 row">
+                    <label for="{text.key}" class="col-3 col-form-label">
+                        {text.label}
+                        <br>
+                        <code class="small text-muted">{text.key}</code>
+                    </label>
+                    <div class="col-9">
+                        <textarea class="form-control" id="{text.key}" name="{text.key}">{text.value}</textarea>
+                        <small class="form-text text-muted">{text.hint}</small>
+                    </div>
+                </div>
+                {/for}
+                <div class="mb-3 mt-3">
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{/body}
+{/include}

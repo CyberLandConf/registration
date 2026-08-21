@@ -110,7 +110,7 @@ public class RegistrationAndDeletionFunctionalTest extends FunctionalTestBase {
             .untilAsserted(() -> assertThat(confirmationSentAt(waiting.getEmail())).isNotNull());
     }
 
-    // Der Nachrichtentyp ist der Vertrag mit den einbettenden JUG-Seiten (docs/handbuch.adoc)
+    // The message type is the contract with the embedding JUG sites (docs/handbuch.adoc)
     @Test
     void testEmbeddedPagesReportTheirHeightToTheHostPage() {
         given()

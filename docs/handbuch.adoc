@@ -517,10 +517,11 @@ tenant" zu sehen. Dann fehlt die passende Rolle im Keycloak.
 
 === Navigation
 
-Links steht eine Leiste mit Logo und Namen der JUG und drei Einträgen:
+Links steht eine Leiste mit Logo und Namen der JUG und vier Einträgen:
 
 * *Events / Registrierungen* – Anmeldungen ansehen und verwalten
 * *JUG Data* – Stammdaten der JUG
+* *Texte* – die Hilfetexte am Anmeldeformular und auf der Webinar-Seite
 * *Logs* – Serverprotokoll (nur mit der zusätzlichen Rolle `admin`)
 
 === Events / Registrierungen
@@ -689,6 +690,23 @@ Kalendereinträge aus.
 insbesondere bei der Events-URL lohnt sich ein prüfender Blick, denn ein Tippfehler dort
 lässt alle Veranstaltungsdetails verschwinden.
 
+=== Texte (Hilfetexte)
+
+Hier stehen die erklärenden Texte, die auf dem Anmeldeformular und auf der Webinar-Seite
+erscheinen – dieselben Schlüssel wie unter <<_hilfetexte_anpassen>>. Jedes Feld zeigt seinen
+Schlüssel und einen Hinweis, wo der Text auftaucht.
+
+*Speichern* schreibt alle Felder auf einmal; die Änderung ist beim nächsten Aufruf des
+Anmeldeformulars sofort sichtbar. Es gibt weder eine Rückfrage noch eine Historie, ein
+überschriebener Text ist also weg.
+
+Die Liste der Schlüssel ist fest: Es sind genau die Texte, die die Anwendung auch anzeigt.
+Neue Schlüssel anzulegen ergibt daher keinen Sinn und ist nicht vorgesehen. Ein leer
+gelassenes Feld lässt die entsprechende Stelle im Formular schlicht leer.
+
+HTML wird nicht interpretiert, sondern als Text ausgegeben – Auszeichnungen wie `<b>` also
+bitte weglassen.
+
 === Logs
 
 Zeigt die letzten Zeilen des Serverprotokolls, standardmäßig 2000, höchstens 3000. Diese
@@ -752,8 +770,8 @@ anpassbar:
 |Hinweis zu den eingesetzten Konferenzwerkzeugen auf der Webinar-Seite
 |===
 
-NOTE: Diese Texte lassen sich derzeit *nicht* über die Oberfläche bearbeiten – sie liegen
-in der Datenbank. Änderungen bitte beim Betreiber der App anfragen.
+Bearbeitet werden diese Texte im Admin-Bereich unter *Texte*, siehe
+<<_texte_hilfetexte>>. Jede JUG pflegt dabei nur ihre eigenen Texte.
 
 == Fehlersuche
 

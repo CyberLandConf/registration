@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
@@ -149,6 +151,76 @@ public class AdminFunctionalTest extends FunctionalTestBase {
             .statusCode(200)
             .body(containsString("href=\"/webinar/" + TENANT + "/" + EVENT_ID + "\""))
         ;
+    }
+
+    @Test
+    void testContentPageListsAllMaintainableTexts() {
+        given().get("/admin/" + TENANT + "/content")
+            .then()
+            .statusCode(200)
+            .body(containsString("registration.name"))
+            .body(containsString("registration.email"))
+            .body(containsString("registration.video"))
+            .body(containsString("registration.disclaimer"))
+            .body(containsString("registration.waitlist"))
+            .body(containsString("webinar.tools"));
+    }
+
+    // What the orga team saves here has to reach the public form -- otherwise they are editing into the void
+    @Test
+    void testEditedContentShowsUpOnRegistrationForm() {
+        String original = contentValue("registration.name");
+        String edited = "Wir brauchen Deinen Namen fuer die Teilnehmerliste.";
+        try {
+            saveContent("registration.name", edited);
+
+            given().get("/admin/" + TENANT + "/content")
+                .then().statusCode(200)
+                .body(containsString(edited));
+
+            given().queryParam("eventId", EVENT_ID)
+                .queryParam("limit", 60)
+                .queryParam("opensBeforeInMonths", 12)
+                .get("/registration/" + TENANT)
+                .then().statusCode(200)
+                .body(containsString(edited));
+        } finally {
+            saveContent("registration.name", original);
+        }
+    }
+
+    // A key no template reads must not end up in the database
+    @Test
+    void testUnknownContentKeysAreIgnored() {
+        given().contentType(ContentType.URLENC)
+            .formParam("bogus.key", "nirgends sichtbar")
+            .redirects().follow(false)
+            .post("/admin/" + TENANT + "/content")
+            .then().statusCode(302);
+
+        given().get("/admin/" + TENANT + "/content")
+            .then().statusCode(200)
+            .body(not(containsString("bogus.key")));
+    }
+
+    private static void saveContent(String key, String value) {
+        given().contentType(ContentType.URLENC)
+            .formParam(key, value)
+            .redirects().follow(false)
+            .post("/admin/" + TENANT + "/content")
+            .then().statusCode(302);
+    }
+
+    private static String contentValue(String key) {
+        return adminPageValue("content", "**.find { it.name() == 'textarea' && it.@name == '" + key + "' }");
+    }
+
+    /** Reads one value out of an admin page, addressed by a GPath expression over the rendered HTML. */
+    private static String adminPageValue(String page, String gpath) {
+        return given().get("/admin/" + TENANT + "/" + page)
+            .then().statusCode(200)
+            .extract().response().htmlPath()
+            .getString(gpath);
     }
 
     @Test

@@ -57,6 +57,7 @@ Known tenants (seeded in `V3__tenant.sql`): `test`, `jugda`, `cyberland`.
 | `GET /admin/{tenant}/events` | OIDC | Admin overview of all events |
 | `GET /admin/{tenant}/events/{eventId}` | OIDC | List registrations for one event (HTML, or JSON with `Accept: application/json`) |
 | `GET/POST /admin/{tenant}/data` | OIDC | View and edit the tenant's master data |
+| `GET/POST /admin/{tenant}/content` | OIDC | View and edit the tenant's help texts (`Content`) |
 | `GET /admin/{tenant}/logs` | OIDC + role `admin` | Tail the server log |
 | `PUT /admin/{tenant}/events/{eventId}/data` | OIDC | Update event metadata |
 | `PUT /admin/{tenant}/events/{eventId}/message` | OIDC | Send bulk email to participants |
@@ -69,6 +70,11 @@ Known tenants (seeded in `V3__tenant.sql`): `test`, `jugda`, `cyberland`.
 - **`EmailService`** — sends confirmation, waitlist-to-attendee, and bulk emails via Quarkus Mailer + Qute templates.
 - **`CleanupJob`** — scheduled job that purges expired registrations (based on `ttl` epoch seconds, set to 1 week after the event).
 - **`Content`** — tenant-scoped key/value texts stored in the `content` table; injected into templates via `Content.asMap()` as `helptext`.
+- **`ContentKey`** — enum of the help-text keys the templates actually read. It is the single source of truth for the
+  admin "Texte" form (`AdminContentResource` / `ContentService`): only these keys are rendered and saved, unknown
+  form fields are dropped. `ContentKeyTemplateTest` scans the templates for `helptext["..."]` and fails in both
+  directions — a lookup with no enum constant (nobody can fill it) and an enum constant no template renders
+  (editing it does nothing).
 
 ### Data Model
 - `Registration` — one row per participant per event; `ttl` auto-expires ~1 week post-event.
