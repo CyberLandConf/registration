@@ -66,6 +66,7 @@ creates the client role of the same name by hand.
 | `GET/POST /admin/{tenant}/data` | OIDC | View and edit the tenant's master data |
 | `GET/POST /admin/{tenant}/content` | OIDC | View and edit the tenant's help texts (`Content`) |
 | `GET/POST /admin/{tenant}/tenants` | OIDC + role `admin` | Create a new JUG by cloning the `test` tenant |
+| `GET /admin/{tenant}/logout` | OIDC | RP-initiated logout, returns to `/admin/{tenant}` |
 | `GET /admin/{tenant}/logs` | OIDC + role `admin` | Tail the server log |
 | `PUT /admin/{tenant}/events/{eventId}/data` | OIDC | Update event metadata |
 | `PUT /admin/{tenant}/events/{eventId}/message` | OIDC | Send bulk email to participants |
@@ -206,6 +207,12 @@ wieder schrumpfen koennte (Rueckkopplung).
   `CurrentUser` is a `@Named @RequestScoped` bean; Qute resolves `inject:` namespace expressions against
   `@Named` beans and validates them at build time, which keeps the flag out of every single resource method.
   The endpoints stay guarded by `@RolesAllowed` — the hidden link is a courtesy, not a permission check.
+- Logout runs through `AdminLogoutResource` (`/admin/{tenant}/logout`), **not** through
+  `quarkus.oidc.logout.path`: the built-in logout offers a single static `post-logout-path`, while the
+  landing page has to carry the tenant. The resource assembles the RP-initiated logout request itself
+  (`id_token_hint` + `post_logout_redirect_uri`) and clears the local session via `OidcSession.logout()`.
+  The post-logout URI must be a valid post-logout redirect URI on the Keycloak client — the dev realm
+  allows `*`, the production client at id.ijug.eu has to permit `https://registration.ijug.eu/admin/*`.
 - Dev mode uses a local Keycloak DevService with `ijug-realm.json`
 
 ### Production Deployment

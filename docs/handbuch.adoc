@@ -82,9 +82,9 @@ bestehende Seite eingebettet – typischerweise in die Detailseite einer Veranst
 |Login + Rolle `admin`
 |Admin: Protokoll des Servers
 
-|`/logout`
-|–
-|Abmelden aus dem Admin-Bereich
+|`/admin/{mandant}/logout`
+|Login
+|Abmelden – auch im Keycloak – und zurück zum Admin-Bereich der JUG
 |===
 
 == Voraussetzungen
@@ -509,8 +509,10 @@ direkt aus ihrem Kalendereintrag zur Einwahl.
 
 Der Einstieg ist `https://registration.ijug.eu/admin/{mandant}/events`. Die Anmeldung
 läuft über den iJUG-Keycloak; nach erfolgreichem Login geht es automatisch zurück zur
-gewünschten Seite. Abgemeldet wird über das eigene Kürzel unten links in der Navigation
-oder direkt über `/logout`.
+gewünschten Seite. Abgemeldet wird über das eigene Kürzel unten links in der Navigation.
+Die Abmeldung gilt auch im Keycloak, nicht nur in dieser Anwendung; danach landet man
+wieder am Admin-Bereich der eigenen JUG – also beim Login. Auf einem geteilten Rechner ist
+damit der nächste Anmeldevorgang direkt startklar.
 
 Wer ein gültiges Konto hat, aber nicht die Rolle des Mandanten, bekommt „No access to
 tenant" zu sehen. Dann fehlt die passende Rolle im Keycloak.
