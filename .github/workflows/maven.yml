@@ -5,6 +5,10 @@ name: CI Build
 
 on:
   push:
+    # main is built by the Docker workflow, which packages the very same commit before it
+    # pushes the image -- running this job there would only duplicate that build.
+    branches-ignore:
+      - main
     paths-ignore:
       - 'README.md'
       - '.github/**'
