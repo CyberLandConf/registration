@@ -25,6 +25,12 @@
             </a>
         </li>
         <li>
+            <a href="./tenants" class="nav-link {#if activeNav == 'tenants'}active{#else}link-body-emphasis{/if}" {#if activeNav == 'tenants'}aria-current="page"{/if}>
+                <i class="bi bi-plus-circle me-1"></i>
+                Neue JUG
+            </a>
+        </li>
+        <li>
             <a href="./logs" class="nav-link {#if activeNav == 'logs'}active{#else}link-body-emphasis{/if}" {#if activeNav == 'logs'}aria-current="page"{/if}>
                 <i class="bi bi-file-text me-1"></i>
                 Logs

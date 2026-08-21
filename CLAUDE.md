@@ -44,6 +44,13 @@ The app serves multiple JUGs from a single deployment. The tenant is always the 
 
 Known tenants (seeded in `V3__tenant.sql`): `test`, `jugda`, `cyberland`.
 
+New tenants are created at runtime by **`TenantProvisioningService`** (`GET/POST /admin/{tenant}/tenants`,
+role `admin`), which clones the `test` tenant: the `tenant` row and all its `content` rows are copied, only
+id and name come from the form. It uses **native SQL on purpose** — `Tenant` and `Content` carry `@TenantId`,
+so every JPA query is filtered to the *current* request's tenant, which is exactly the isolation this one
+operation has to cross. Keycloak is not touched: a new tenant is unreachable in the admin UI until someone
+creates the client role of the same name by hand.
+
 ### Endpoints
 
 | Path | Auth | Description |
@@ -58,6 +65,7 @@ Known tenants (seeded in `V3__tenant.sql`): `test`, `jugda`, `cyberland`.
 | `GET /admin/{tenant}/events/{eventId}` | OIDC | List registrations for one event (HTML, or JSON with `Accept: application/json`) |
 | `GET/POST /admin/{tenant}/data` | OIDC | View and edit the tenant's master data |
 | `GET/POST /admin/{tenant}/content` | OIDC | View and edit the tenant's help texts (`Content`) |
+| `GET/POST /admin/{tenant}/tenants` | OIDC + role `admin` | Create a new JUG by cloning the `test` tenant |
 | `GET /admin/{tenant}/logs` | OIDC + role `admin` | Tail the server log |
 | `PUT /admin/{tenant}/events/{eventId}/data` | OIDC | Update event metadata |
 | `PUT /admin/{tenant}/events/{eventId}/message` | OIDC | Send bulk email to participants |

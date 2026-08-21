@@ -1,0 +1,62 @@
+{#include template.html}
+{#body}
+<div class="container">
+    <div class="row">
+        {#include admin/menu.html/}
+        <div class="col">
+            <h2 class="fw-light my-3">Neue JUG anlegen</h2>
+
+            {#if created}
+            <div class="alert alert-success" role="alert">
+                Die JUG <strong>{created}</strong> wurde angelegt – mit den Stammdaten und Texten der
+                Vorlage-JUG <code>{templateTenant}</code>.
+                <hr>
+                Damit das Orga-Team der neuen JUG sich anmelden kann, braucht es im Keycloak noch eine
+                Client-Rolle <code>{created}</code> am Client <code>registration</code>. Ohne diese Rolle
+                ist der Admin-Bereich der neuen JUG für niemanden erreichbar.
+            </div>
+            {/if}
+
+            {#if error}
+            <div class="alert alert-danger" role="alert">{error}</div>
+            {/if}
+
+            <p class="text-muted">
+                Die neue JUG startet mit einer Kopie der Stammdaten und Hilfetexte der Vorlage-JUG
+                <code>{templateTenant}</code>. Alles Weitere wird anschließend unter <em>JUG Data</em> und
+                <em>Texte</em> angepasst.
+            </p>
+
+            <form method="post" action="/admin/{tenant.id}/tenants">
+                <div class="mb-2 row">
+                    <label for="id" class="col-3 col-form-label">ID</label>
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="id" name="id" value="{newTenantId ?: ''}"
+                               required autofocus>
+                        <small class="form-text text-muted">
+                            Kleinbuchstaben, Ziffern und Bindestriche, z.B. <code>jugda</code>. Die ID steht
+                            in allen URLs der JUG und muss genauso als Keycloak-Rolle vergeben werden.
+                            Sie lässt sich später nicht mehr ändern.
+                        </small>
+                    </div>
+                </div>
+                <div class="mb-2 row">
+                    <label for="name" class="col-3 col-form-label">Name</label>
+                    <div class="col-9">
+                        <input type="text" class="form-control" id="name" name="name" value="{newTenantName ?: ''}"
+                               required>
+                        <small class="form-text text-muted">
+                            Ausgeschriebener Name, z.B. <code>JUG Darmstadt</code>. Erscheint in Betreffzeilen,
+                            Grußformeln und im Kalendereintrag.
+                        </small>
+                    </div>
+                </div>
+                <div class="mb-3 mt-3">
+                    <button type="submit" class="btn btn-primary">JUG anlegen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{/body}
+{/include}

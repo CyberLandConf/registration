@@ -4,13 +4,12 @@ import io.quarkus.mailer.Mail;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
@@ -221,6 +220,63 @@ public class AdminFunctionalTest extends FunctionalTestBase {
             .then().statusCode(200)
             .extract().response().htmlPath()
             .getString(gpath);
+    }
+
+    // Creating a JUG is an operator job, the tenant role alone must not be enough
+    @Test
+    void testCreatingAJugNeedsTheAdminRole() {
+        given().get("/admin/" + TENANT + "/tenants")
+            .then().statusCode(403);
+
+        postNewTenant("sneaky", "Sneaky JUG")
+            .then().statusCode(403);
+    }
+
+    // A fresh JUG has to arrive fully furnished: master data and help texts of the template tenant
+    @Test
+    @TestSecurity(user = "root", roles = {"test", "admin", "newjug"})
+    void testCreatedJugStartsWithTheDataOfTheTemplateTenant() {
+        postNewTenant("newjug", "Neue JUG")
+            .then().statusCode(302)
+            .header("Location", containsString("created=newjug"));
+
+        given().get("/admin/newjug/data")
+            .then().statusCode(200)
+            .body(containsString("value=\"newjug\""))
+            .body(containsString("value=\"Neue JUG\""))
+            .body(containsString(tenantFieldOfTemplate("website")));
+
+        given().get("/admin/newjug/content")
+            .then().statusCode(200)
+            .body(containsString("registration.name"))
+            .body(containsString(contentValue("registration.name")));
+    }
+
+    @Test
+    @TestSecurity(user = "root", roles = {"test", "admin"})
+    void testJugIdIsRejectedWhenAlreadyTakenOrMalformed() {
+        postNewTenant("Neue JUG!", "Kaputte ID")
+            .then().statusCode(200)
+            .body(containsString("nur Kleinbuchstaben"));
+
+        postNewTenant("twicejug", "Einmal JUG")
+            .then().statusCode(302);
+
+        postNewTenant("twicejug", "Nochmal JUG")
+            .then().statusCode(200)
+            .body(containsString("bereits eine JUG mit der ID"));
+    }
+
+    /** Never follows the redirect: the assertions are about the response itself, not the page behind it. */
+    private static Response postNewTenant(String id, String name) {
+        return given().contentType(ContentType.URLENC)
+            .formParams("id", id, "name", name)
+            .redirects().follow(false)
+            .post("/admin/" + TENANT + "/tenants");
+    }
+
+    private static String tenantFieldOfTemplate(String field) {
+        return adminPageValue("data", "**.find { it.@id == '" + field + "' }.@value");
     }
 
     @Test

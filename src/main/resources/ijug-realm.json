@@ -21,6 +21,7 @@
         { "name": "test", "description": "Test-JUG" },
         { "name": "jugda", "description": "JUG DA" },
         { "name": "cyberland", "description": "CyberLand" },
+        { "name": "neu", "description": "Neue JUG" },
         { "name": "admin", "description": "Global admin (log viewer)" }
       ]
     }
@@ -37,7 +38,7 @@
         { "type": "password", "value": "alice", "temporary": false }
       ],
       "clientRoles": {
-        "registration": ["test", "jugda", "cyberland", "admin"]
+        "registration": ["test", "jugda", "cyberland", "neu", "admin"]
       }
     },
     {

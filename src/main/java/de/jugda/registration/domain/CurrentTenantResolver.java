@@ -21,6 +21,6 @@ public class CurrentTenantResolver implements TenantResolver {
     @Override
     public String resolveTenantId() {
         String t = ctx.getTenantId();
-        return t != null ? t : getDefaultTenantId();   // Fallback fuer Nicht-Request-Kontexte (Jobs!)
+        return t != null ? t : getDefaultTenantId();   // fallback for non-request contexts (jobs!)
     }
 }

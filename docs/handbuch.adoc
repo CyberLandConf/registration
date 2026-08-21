@@ -517,11 +517,12 @@ tenant" zu sehen. Dann fehlt die passende Rolle im Keycloak.
 
 === Navigation
 
-Links steht eine Leiste mit Logo und Namen der JUG und vier Einträgen:
+Links steht eine Leiste mit Logo und Namen der JUG und fünf Einträgen:
 
 * *Events / Registrierungen* – Anmeldungen ansehen und verwalten
 * *JUG Data* – Stammdaten der JUG
 * *Texte* – die Hilfetexte am Anmeldeformular und auf der Webinar-Seite
+* *Neue JUG* – eine weitere JUG anlegen (nur mit der zusätzlichen Rolle `admin`)
 * *Logs* – Serverprotokoll (nur mit der zusätzlichen Rolle `admin`)
 
 === Events / Registrierungen
@@ -706,6 +707,38 @@ gelassenes Feld lässt die entsprechende Stelle im Formular schlicht leer.
 
 HTML wird nicht interpretiert, sondern als Text ausgegeben – Auszeichnungen wie `<b>` also
 bitte weglassen.
+
+=== Neue JUG anlegen
+
+Diese Seite legt eine weitere JUG in der Anwendung an. Sie ist den Betreibern vorbehalten und
+erfordert zusätzlich zur Mandantenrolle die Rolle `admin`; für die Orga-Teams der einzelnen
+JUGs ist sie gesperrt.
+
+Einzutragen sind nur zwei Angaben:
+
+[%header,cols="1,3"]
+|===
+|Feld |Bedeutung
+
+|ID
+|Die Mandanten-ID, z.B. `jugda`. Erlaubt sind Kleinbuchstaben, Ziffern und Bindestriche.
+Sie steht in sämtlichen URLs der JUG und lässt sich später *nicht* mehr ändern.
+
+|Name
+|Ausgeschriebener Name, z.B. `JUG Darmstadt`. Erscheint in Betreffzeilen, Grußformeln und im
+Kalendereintrag.
+|===
+
+Alles Übrige – Website, Datenschutz- und Impressum-URL, Logo, Reply-To, Events-URL sowie
+sämtliche Hilfetexte – wird von der Vorlage-JUG `test` kopiert. Die neue JUG ist damit sofort
+funktionsfähig, zeigt aber noch die Daten der Vorlage. Der nächste Schritt ist deshalb immer
+ein Durchgang durch <<_jug_data_stammdaten>> und <<_texte_hilfetexte>> der neuen JUG.
+
+IMPORTANT: Die Anwendung kann keine Benutzerrechte vergeben. Damit das Orga-Team der neuen JUG
+sich anmelden kann, muss im Keycloak am Client `registration` eine Client-Rolle mit *exakt* der
+neuen Mandanten-ID angelegt und den betreffenden Konten zugewiesen werden. Ohne diese Rolle ist
+der Admin-Bereich der neuen JUG für niemanden erreichbar – das Anmeldeformular für die
+Teilnehmer funktioniert dagegen sofort.
 
 === Logs
 
