@@ -30,7 +30,7 @@
                 <label class="form-check-label" for="remote">Ich nehme nur Online/Remote teil.</label>
             </div>
         {/if}
-        {#if !cfg.hideVideoRecording}
+        {#if cfg.showVideoRecording}
         <div class="mb-2 form-check">
             <input type="checkbox" class="form-check-input required" name="videoRecording" id="videoRecording">
             <label class="form-check-label" for="videoRecording">
@@ -51,7 +51,7 @@
         <input type="hidden" name="eventId" value="{form.eventId}"/>
         <input type="hidden" name="limit" value="{form.limit}"/>
         <input type="hidden" name="showPub" value="{form.showPub}"/>
-        <input type="hidden" name="hideVideoRecording" value="{form.hideVideoRecording}"/>
+        <input type="hidden" name="showVideoRecording" value="{form.showVideoRecording}"/>
         <input type="hidden" name="hybrid" value="{form.hybrid}"/>
     </form>
     <p class="text-muted">

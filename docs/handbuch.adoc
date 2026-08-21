@@ -239,10 +239,10 @@ mit dem Starttermin.
 |`false`
 |Bei `true` erscheint die Checkbox „Ich nehme nur Online/Remote teil".
 
-|`hideVideoRecording`
+|`showVideoRecording`
 |`false`
-|Bei `true` wird die Pflicht-Checkbox zur Videoaufzeichnung *ausgeblendet* – für
-Veranstaltungen, die nicht aufgezeichnet werden.
+|Bei `true` erscheint die Pflicht-Checkbox zur Videoaufzeichnung – nur für
+Veranstaltungen, die tatsächlich aufgezeichnet werden.
 |===
 
 === Welche Seite wann erscheint
@@ -274,11 +274,11 @@ Standard-Abendveranstaltung mit 60 Plätzen, Anmeldung ab einem Monat vorher:
 /registration/jugda?eventId=2026-11-19
 ----
 
-Kleiner Workshop mit 25 Plätzen, Anmeldung ab drei Monaten vorher, ohne Aufzeichnung:
+Kleiner Workshop mit 25 Plätzen, Anmeldung ab drei Monaten vorher, mit Aufzeichnung:
 
 [source]
 ----
-/registration/jugda?eventId=2026-11-19&limit=25&opensBeforeInMonths=3&hideVideoRecording=true
+/registration/jugda?eventId=2026-11-19&limit=25&opensBeforeInMonths=3&showVideoRecording=true
 ----
 
 Hybride Veranstaltung mit anschließendem Stammtisch, Anmeldeschluss am Vortag um Mitternacht:
@@ -316,7 +316,7 @@ Rundmails.
 
 |Videoaufzeichnung
 |ja
-|Nur wenn `hideVideoRecording` *nicht* gesetzt ist.
+|Nur bei `showVideoRecording=true`.
 
 |Datenschutzhinweis
 |ja

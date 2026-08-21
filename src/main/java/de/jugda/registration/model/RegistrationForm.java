@@ -37,8 +37,8 @@ public class RegistrationForm {
     public int limit;
     @FormParam("showPub")
     public boolean showPub;
-    @FormParam("hideVideoRecording")
-    public boolean hideVideoRecording;
+    @FormParam("showVideoRecording")
+    public boolean showVideoRecording;
     @FormParam("hybrid")
     public boolean hybrid;
 

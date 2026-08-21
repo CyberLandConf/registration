@@ -50,7 +50,7 @@ public class RegistrationResource {
     public TemplateInstance getForm(@QueryParam("eventId") String eventId,
                                     @QueryParam("limit") @DefaultValue("60") int limit,
                                     @QueryParam("showPub") @DefaultValue("false") boolean showPub,
-                                    @QueryParam("hideVideoRecording") @DefaultValue("false") boolean hideVideoRecording,
+                                    @QueryParam("showVideoRecording") @DefaultValue("false") boolean showVideoRecording,
                                     @QueryParam("hybrid") @DefaultValue("false") boolean hybrid,
                                     @QueryParam("deadline") String deadline,
                                     @QueryParam("opensBeforeInMonths") @DefaultValue("1") int opensBeforeInMonths) {
@@ -73,11 +73,11 @@ public class RegistrationResource {
             form.setEventId(eventId);
             form.setLimit(limit);
             form.setShowPub(showPub);
-            form.setHideVideoRecording(hideVideoRecording);
+            form.setShowVideoRecording(showVideoRecording);
             form.setHybrid(hybrid);
             RegistrationConfig cfg = new RegistrationConfig(
                 limit, limit - registrationCount, registrationCount,
-                showPub, hideVideoRecording, hybrid,
+                showPub, showVideoRecording, hybrid,
                 registrationCount >= limit
             );
             response = registration.data("form", form)
@@ -107,7 +107,7 @@ public class RegistrationResource {
                 registrationForm.getLimit() - registrationCount,
                 registrationCount,
                 registrationForm.isShowPub(),
-                registrationForm.isHideVideoRecording(),
+                registrationForm.isShowVideoRecording(),
                 registrationForm.isHybrid(),
                 registrationCount >= registrationForm.getLimit()
             );

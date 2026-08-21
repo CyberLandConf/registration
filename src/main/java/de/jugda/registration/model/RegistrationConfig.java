@@ -8,7 +8,7 @@ public record RegistrationConfig(
     long freeSeats,
     long actualCount,
     boolean showPub,
-    boolean hideVideoRecording,
+    boolean showVideoRecording,
     boolean hybrid,
     boolean waitlist
 ) {}
