@@ -317,6 +317,15 @@ public class AdminFunctionalTest extends FunctionalTestBase {
             .body(containsString("href=\"./events\""));
     }
 
+    // Support questions start with "which version are you on?" -- the answer belongs where the user is
+    @Test
+    void testMenuShowsTheRunningAppVersion() {
+        String version = ConfigProvider.getConfig().getValue("quarkus.application.version", String.class);
+        given().get("/admin/" + TENANT + "/events")
+            .then().statusCode(200)
+            .body(containsString("Version " + version));
+    }
+
     @Test
     void testWebinarPage() {
         given()

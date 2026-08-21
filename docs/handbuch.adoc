@@ -529,6 +529,9 @@ nur bei Konten mit der zusätzlichen Rolle `admin`, zu den beiden Betreiber-Seit
 <<_neue_jug_anlegen>> und <<_logs>>. Wer diese Einträge nicht sieht, dem fehlt die Rolle – für
 die Arbeit einer JUG werden beide Seiten nicht gebraucht.
 
+Unter dem Logout steht die Version der laufenden Anwendung. Bei Rückfragen an den Betreiber
+gehört sie in die erste Zeile der Mail.
+
 === Events / Registrierungen
 
 Die Startseite listet alle Veranstaltungen, zu denen es Anmeldungen gibt, mit der jeweiligen
