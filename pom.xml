@@ -202,6 +202,10 @@
         <version>${compiler-plugin.version}</version>
         <configuration>
           <parameters>true</parameters>
+          <!-- Since JDK 23 javac no longer discovers annotation processors on the classpath by
+               default, which silently turns Lombok off: the build then fails with "cannot find
+               symbol: method getName()" on every @Getter/@Value class. -->
+          <proc>full</proc>
         </configuration>
       </plugin>
       <plugin>
