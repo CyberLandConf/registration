@@ -8,19 +8,19 @@
     {#let nav=activeNav.or('')}
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="./events" class="nav-link {#if nav == 'events'}active{#else}link-body-emphasis{/if}" {#if nav == 'events'}aria-current="page"{/if}>
+            <a href="/admin/{tenant.id}/events" class="nav-link {#if nav == 'events'}active{#else}link-body-emphasis{/if}" {#if nav == 'events'}aria-current="page"{/if}>
                 <i class="bi bi-calendar-event me-1"></i>
                 Events / Registrierungen
             </a>
         </li>
         <li>
-            <a href="./data" class="nav-link {#if nav == 'data'}active{#else}link-body-emphasis{/if}" {#if nav == 'data'}aria-current="page"{/if}>
+            <a href="/admin/{tenant.id}/data" class="nav-link {#if nav == 'data'}active{#else}link-body-emphasis{/if}" {#if nav == 'data'}aria-current="page"{/if}>
                 <i class="bi bi-database me-1"></i>
                 JUG Data
             </a>
         </li>
         <li>
-            <a href="./content" class="nav-link {#if nav == 'content'}active{#else}link-body-emphasis{/if}" {#if nav == 'content'}aria-current="page"{/if}>
+            <a href="/admin/{tenant.id}/content" class="nav-link {#if nav == 'content'}active{#else}link-body-emphasis{/if}" {#if nav == 'content'}aria-current="page"{/if}>
                 <i class="bi bi-card-text me-1"></i>
                 Texte
             </a>
@@ -37,13 +37,13 @@
         <ul class="dropdown-menu text-small shadow">
             {#if inject:currentUser.admin}
             <li>
-                <a class="dropdown-item" href="./tenants">
+                <a class="dropdown-item" href="/admin/{tenant.id}/tenants">
                     <i class="bi bi-plus-circle me-1"></i>
                     Neue JUG
                 </a>
             </li>
             <li>
-                <a class="dropdown-item" href="./logs">
+                <a class="dropdown-item" href="/admin/{tenant.id}/logs">
                     <i class="bi bi-file-text me-1"></i>
                     Server-Logs
                 </a>
@@ -51,7 +51,7 @@
             <li><hr class="dropdown-divider"></li>
             {/if}
             <li>
-                <a class="dropdown-item" href="./logout">
+                <a class="dropdown-item" href="/admin/{tenant.id}/logout">
                     <i class="bi bi-box-arrow-right me-1"></i>
                     Logout
                 </a>

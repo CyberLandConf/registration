@@ -288,23 +288,37 @@ public class AdminFunctionalTest extends FunctionalTestBase {
     // The identity comes from @TestSecurity, which is per method, so the role is what splits these two
     // tests while the menu entry is the parameter.
     @ParameterizedTest
-    @CsvSource({"./events,true", "./data,true", "./content,true", "./tenants,false", "./logs,false"})
-    void testOrgaTeamsSeeTheirOwnEntriesAndNoOperatorEntries(String href, boolean visible) {
-        assertMenuEntry(href, visible);
+    @CsvSource({"events,true", "data,true", "content,true", "tenants,false", "logs,false"})
+    void testOrgaTeamsSeeTheirOwnEntriesAndNoOperatorEntries(String page, boolean visible) {
+        assertMenuEntry(page, visible);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"./events", "./data", "./content", "./tenants", "./logs"})
+    @ValueSource(strings = {"events", "data", "content", "tenants", "logs"})
     @TestSecurity(user = "root", roles = {"test", "admin"})
-    void testAdminsSeeEveryEntry(String href) {
-        assertMenuEntry(href, true);
+    void testAdminsSeeEveryEntry(String page) {
+        assertMenuEntry(page, true);
     }
 
-    private static void assertMenuEntry(String href, boolean visible) {
-        Matcher<String> link = containsString("href=\"" + href + "\"");
+    private static void assertMenuEntry(String page, boolean visible) {
+        Matcher<String> link = containsString(menuHref(page));
         given().get("/admin/" + TENANT + "/events")
             .then().statusCode(200)
             .body(visible ? link : not(link));
+    }
+
+    // The menu is included by pages at two different path depths. Relative hrefs used to resolve
+    // against /admin/{tenant}/events/ on the registration list and produced /admin/{tenant}/events/events
+    @ParameterizedTest
+    @ValueSource(strings = {"events", "data", "content"})
+    void testMenuLinksAreAbsoluteOnTheEventDetailPage(String page) {
+        given().get("/admin/" + TENANT + "/events/" + EVENT_ID)
+            .then().statusCode(200)
+            .body(containsString(menuHref(page)));
+    }
+
+    private static String menuHref(String page) {
+        return "href=\"/admin/" + TENANT + "/" + page + "\"";
     }
 
     // The operator pages highlight no nav entry and therefore pass no activeNav -- menu.html has to
@@ -314,7 +328,7 @@ public class AdminFunctionalTest extends FunctionalTestBase {
     void testOperatorPagesRenderWithoutAnActiveNavEntry() {
         given().get("/admin/" + TENANT + "/logs")
             .then().statusCode(200)
-            .body(containsString("href=\"./events\""));
+            .body(containsString(menuHref("events")));
     }
 
     // Support questions start with "which version are you on?" -- the answer belongs where the user is

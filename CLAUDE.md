@@ -201,6 +201,11 @@ wieder schrumpfen koennte (Rueckkopplung).
 - `admin/menu.html` binds `{#let nav=activeNav.or('')}` around the nav list. Qute renders strictly: a page
   that simply omits `activeNav` from its template data would fail with a 500, not a blank highlight. The
   binding lets the operator pages, which highlight no nav entry, leave it out.
+- **Alle Links in `admin/menu.html` sind absolut (`/admin/{tenant.id}/...`), nicht relativ.** Das Menue wird
+  von Seiten auf zwei Pfadtiefen eingebunden: `/admin/{tenant}/events` und `/admin/{tenant}/events/{eventId}`
+  (`admin/list.html`). Ein relatives `./events` loeste auf der Detailseite gegen `/admin/{tenant}/events/` auf
+  und landete bei `/admin/{tenant}/events/events` -- 404 statt Navigation. Die uebrigen Admin-Templates waren
+  schon vorher absolut. `AdminFunctionalTest.testMenuLinksAreAbsoluteOnTheEventDetailPage` haelt das fest.
 - The two operator-only pages (*Neue JUG*, *Server-Logs*) live in the user dropdown at the bottom of
   `admin/menu.html`, wrapped in `{#if inject:currentUser.admin}`; the nav list above holds only the pages every
   orga team uses.
