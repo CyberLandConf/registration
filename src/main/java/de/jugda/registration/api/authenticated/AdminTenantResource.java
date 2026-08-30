@@ -1,6 +1,7 @@
 package de.jugda.registration.api.authenticated;
 
 import de.jugda.registration.TenantContext;
+import de.jugda.registration.TenantStyle;
 import de.jugda.registration.domain.Tenant;
 import de.jugda.registration.model.TenantForm;
 import io.quarkus.oidc.IdToken;
@@ -42,16 +43,24 @@ public class AdminTenantResource {
 
     @GET
     public TemplateInstance get() {
-        return data
-            .data("tenant", tenantCtx.getTenant())
-            .data("id", idToken)
-            .data("activeNav", "data");
+        return page(TenantForm.of(tenantCtx.getTenant()), null);
     }
 
+    /**
+     * Stays {@code @Transactional} as a whole rather than delegating the write to a {@code save()} method:
+     * that call would be a self-invocation and the interceptor would never fire. The validation runs before
+     * anything is touched, so the error branch commits an empty transaction.
+     */
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Transactional
     public Response post(@BeanParam TenantForm form) {
+        if (TenantStyle.closesTheStyleElement(form.getCss())) {
+            // Would end the <style> element it is rendered into and turn the rest into markup.
+            // Hand the entered values back rather than swallowing a whole stylesheet over one line.
+            return Response.ok(page(form, "Das CSS darf kein </style> enthalten.")).build();
+        }
+
         Tenant tenant = tenantCtx.getTenant();
         tenant.setName(form.getName());
         tenant.setWebsite(form.getWebsite());
@@ -60,8 +69,19 @@ public class AdminTenantResource {
         tenant.setLogo(form.getLogo());
         tenant.setReplyTo(form.getReplyTo());
         tenant.setEvents(form.getEvents());
+        // The field is optional: an emptied textarea has to clear the column, not store a blank string
+        tenant.setCss(form.getCss() == null || form.getCss().isBlank() ? null : form.getCss().strip());
         return Response.status(Response.Status.FOUND)
             .location(uriInfo.getRequestUri())
             .build();
+    }
+
+    private TemplateInstance page(TenantForm form, String error) {
+        return data
+            .data("tenant", tenantCtx.getTenant())
+            .data("form", form)
+            .data("id", idToken)
+            .data("error", error)
+            .data("activeNav", "data");
     }
 }

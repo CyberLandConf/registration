@@ -76,7 +76,7 @@ bestehende Seite eingebettet – typischerweise in die Detailseite einer Veranst
 
 |`/admin/{mandant}/data`
 |Login
-|Admin: Stammdaten der JUG
+|Admin: Stammdaten der JUG (inkl. eigenem CSS)
 
 |`/admin/{mandant}/logs`
 |Login + Rolle `admin`
@@ -137,6 +137,7 @@ Daraus folgt auch: *pro Tag kann es nur eine Veranstaltung geben.* Zwei Events a
 Tag teilen sich sonst dieselbe Teilnehmerliste.
 ====
 
+[#_iframe_hoehe]
 === Die Höhe des iframes
 
 Ein `<iframe>` wächst nicht von allein mit seinem Inhalt mit, und die umgebende Seite darf
@@ -694,11 +695,48 @@ Kalendereinträge aus.
 
 |Events-URL
 |Adresse der JSON-Datei mit den Veranstaltungsdaten, siehe <<_die_events_datei>>.
+
+|Eigenes CSS
+|Optionales Stylesheet für die Teilnehmer-Seiten, siehe <<_eigenes_css>>.
 |===
 
 *Speichern* schreibt die Änderungen sofort. Es gibt keine Rückfrage und keine Historie –
 insbesondere bei der Events-URL lohnt sich ein prüfender Blick, denn ein Tippfehler dort
 lässt alle Veranstaltungsdetails verschwinden.
+
+[#_eigenes_css]
+==== Eigenes CSS
+
+Das Feld *Eigenes CSS* ist leer vorbelegt und darf leer bleiben; dann bleibt es beim
+Standard-Layout. Wer die eingebetteten Seiten an das Aussehen der eigenen Website angleichen
+möchte, trägt hier ganz normale CSS-Regeln ein – ohne `<style>`-Tag drumherum:
+
+[source,css]
+----
+body { font-family: Georgia, serif; }
+h3 { color: #005f73; }
+.btn-primary { background-color: #005f73; border-color: #005f73; }
+----
+
+Ein paar Punkte dazu:
+
+* Das Stylesheet wirkt *nur auf die Teilnehmer-Seiten*: Anmeldung, Danke-Seite, Abmeldung,
+  „Anmeldung geschlossen", „Anmeldung noch nicht offen" und die Webinar-Seite. Der Admin-Bereich
+  bleibt bewusst unberührt – ein missglücktes Stylesheet soll nicht ausgerechnet das Formular
+  unbedienbar machen, in dem man es wieder repariert. Zum Ausprobieren also immer die
+  Anmeldeseite selbst aufrufen.
+* Es wird *nach* Bootstrap geladen. Eigene Regeln gewinnen deshalb in der Regel, ohne dass
+  `!important` nötig wäre.
+* E-Mails sind nicht betroffen. Deren Aussehen liegt in den Mail-Vorlagen der Anwendung.
+* `</style>` ist nicht erlaubt und wird beim Speichern mit einer Fehlermeldung abgelehnt – die
+  Zeichenfolge würde das Stylesheet beenden und den Rest als HTML in die Seite schreiben. In
+  echtem CSS kommt sie ohnehin nicht vor.
+* Die Höhenmeldung an die einbettende Seite (siehe <<_iframe_hoehe>>) misst die Höhe
+  *nach* Anwendung des Stylesheets. Feste Höhen oder `position: fixed` auf `body` können sie
+  daher aus dem Tritt bringen.
+
+Auch hier gibt es weder Rückfrage noch Historie: Speichern überschreibt das bisherige
+Stylesheet. Bei größeren Anpassungen lohnt sich eine Kopie außerhalb der Anwendung.
 
 === Texte (Hilfetexte)
 
@@ -739,8 +777,9 @@ Sie steht in sämtlichen URLs der JUG und lässt sich später *nicht* mehr ände
 Kalendereintrag.
 |===
 
-Alles Übrige – Website, Datenschutz- und Impressum-URL, Logo, Reply-To, Events-URL sowie
-sämtliche Hilfetexte – wird von der Vorlage-JUG `test` kopiert. Die neue JUG ist damit sofort
+Alles Übrige – Website, Datenschutz- und Impressum-URL, Logo, Reply-To, Events-URL, ein
+eventuell hinterlegtes eigenes CSS sowie sämtliche Hilfetexte – wird von der Vorlage-JUG `test`
+kopiert. Die neue JUG ist damit sofort
 funktionsfähig, zeigt aber noch die Daten der Vorlage. Der nächste Schritt ist deshalb immer
 ein Durchgang durch <<_jug_data_stammdaten>> und <<_texte_hilfetexte>> der neuen JUG.
 

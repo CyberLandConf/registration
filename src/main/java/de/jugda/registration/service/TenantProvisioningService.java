@@ -52,8 +52,8 @@ public class TenantProvisioningService {
         // Keep this column list in sync with the Tenant entity: a column added there and forgotten here
         // clones as empty, which is exactly the silent half-configured JUG this page exists to prevent.
         int created = em.createNativeQuery("""
-                insert into tenant (id, name, website, privacy, imprint, logo, reply_to, events)
-                select :id, :name, website, privacy, imprint, logo, reply_to, events
+                insert into tenant (id, name, website, privacy, imprint, logo, reply_to, events, css)
+                select :id, :name, website, privacy, imprint, logo, reply_to, events, css
                   from tenant where id = :template
                 """)
             .setParameter("id", tenantId)

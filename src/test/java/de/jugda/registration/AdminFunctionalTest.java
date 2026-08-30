@@ -283,6 +283,93 @@ public class AdminFunctionalTest extends FunctionalTestBase {
         return adminPageValue("data", "**.find { it.@id == '" + field + "' }.@value");
     }
 
+    // The whole point of the field: the JUGs' own look'n'feel on the pages their website embeds --
+    // and nowhere else. Tenant CSS in the admin area could break the very form that repairs it.
+    @Test
+    void testTenantCssStylesTheParticipantPagesOnly() {
+        String css = "body { background: rgb(1, 2, 3); }";
+        try {
+            saveTenantCss(css).then().statusCode(302);
+
+            given().queryParam("eventId", EVENT_ID)
+                .queryParam("limit", 60)
+                .queryParam("opensBeforeInMonths", 12)
+                .get("/registration/" + TENANT)
+                .then().statusCode(200)
+                .body(containsString("<style>" + css + "</style>"));
+
+            // Reaches a page that passes no tenant of its own to the template
+            given().queryParam("eventId", EVENT_ID)
+                .get("/registration/" + TENANT + "/delete")
+                .then().statusCode(200)
+                .body(containsString("<style>" + css + "</style>"));
+
+            // The admin page shows the CSS in its textarea, but must not apply it
+            given().get("/admin/" + TENANT + "/data")
+                .then().statusCode(200)
+                .body(containsString(css))
+                .body(not(containsString("<style>" + css)));
+        } finally {
+            saveTenantCss("").then().statusCode(302);
+        }
+    }
+
+    // Optional means optional: without CSS the pages carry no empty <style> element either
+    @Test
+    void testWithoutTenantCssThePagesStayUnstyled() {
+        saveTenantCss("   ").then().statusCode(302);
+
+        given().queryParam("eventId", EVENT_ID)
+            .queryParam("limit", 60)
+            .queryParam("opensBeforeInMonths", 12)
+            .get("/registration/" + TENANT)
+            .then().statusCode(200)
+            .body(not(containsString("<style>")));
+
+        assertThat(tenantCss()).isEmpty();
+    }
+
+    // </style> would end the element and turn everything after it into markup -- the one sequence
+    // that makes an optional stylesheet an HTML injection
+    @Test
+    void testCssThatWouldCloseTheStyleElementIsRejected() {
+        saveTenantCss("body {}</style><script>alert(1)</script>")
+            .then().statusCode(200)
+            .body(containsString("darf kein"));
+
+        assertThat(tenantCss()).isEmpty();
+
+        given().queryParam("eventId", EVENT_ID)
+            .queryParam("limit", 60)
+            .queryParam("opensBeforeInMonths", 12)
+            .get("/registration/" + TENANT)
+            .then().statusCode(200)
+            .body(not(containsString("alert(1)")));
+    }
+
+    /**
+     * Posts the whole form, not just the CSS: the page saves every field at once, so anything left
+     * out would be nulled -- including the events URL the other tests depend on.
+     */
+    private static Response saveTenantCss(String css) {
+        return given().contentType(ContentType.URLENC)
+            .formParams("name", tenantFieldOfTemplate("name"),
+                "website", tenantFieldOfTemplate("website"),
+                "privacy", tenantFieldOfTemplate("privacy"),
+                "imprint", tenantFieldOfTemplate("imprint"),
+                "logo", tenantFieldOfTemplate("logo"),
+                "replyTo", tenantFieldOfTemplate("replyTo"),
+                "events", tenantFieldOfTemplate("events"),
+                "css", css)
+            .redirects().follow(false)
+            .post("/admin/" + TENANT + "/data");
+    }
+
+    private static String tenantCss() {
+        String value = adminPageValue("data", "**.find { it.name() == 'textarea' && it.@id == 'css' }");
+        return value == null ? "" : value.strip();
+    }
+
     // Links into pages the orga team may not open are only noise -- and an invitation to a 403
     // Links into pages the orga team may not open are only noise -- and an invitation to a 403.
     // The identity comes from @TestSecurity, which is per method, so the role is what splits these two

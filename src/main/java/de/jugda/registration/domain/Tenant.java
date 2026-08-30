@@ -29,4 +29,7 @@ public class Tenant extends PanacheEntityBase {
     @Column(name = "reply_to")
     private String replyTo;
     private String events;
+    /** Optional, tenant-owned stylesheet for the participant pages, see {@link de.jugda.registration.TenantStyle}. */
+    @Column(columnDefinition = "text")
+    private String css;
 }

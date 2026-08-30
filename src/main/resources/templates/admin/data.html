@@ -5,6 +5,11 @@
         {#include admin/menu.html/}
         <div class="col">
             <h2 class="fw-light my-3">JUG Daten</h2>
+
+            {#if error}
+            <div class="alert alert-danger" role="alert">{error}</div>
+            {/if}
+
             <form method="post" action="/admin/{tenant.id}/data">
                 <div class="mb-2 row">
                     <label class="col-3 col-form-label">ID</label>
@@ -15,43 +20,58 @@
                 <div class="mb-2 row">
                     <label for="name" class="col-3 col-form-label">Name</label>
                     <div class="col-9">
-                        <input type="text" class="form-control" id="name" name="name" value="{tenant.name}">
+                        <input type="text" class="form-control" id="name" name="name" value="{form.name ?: ''}">
                     </div>
                 </div>
                 <div class="mb-2 row">
                     <label for="website" class="col-3 col-form-label">Website</label>
                     <div class="col-9">
-                        <input type="url" class="form-control" id="website" name="website" value="{tenant.website}">
+                        <input type="url" class="form-control" id="website" name="website" value="{form.website ?: ''}">
                     </div>
                 </div>
                 <div class="mb-2 row">
                     <label for="privacy" class="col-3 col-form-label">Datenschutz-URL</label>
                     <div class="col-9">
-                        <input type="url" class="form-control" id="privacy" name="privacy" value="{tenant.privacy}">
+                        <input type="url" class="form-control" id="privacy" name="privacy" value="{form.privacy ?: ''}">
                     </div>
                 </div>
                 <div class="mb-2 row">
                     <label for="imprint" class="col-3 col-form-label">Impressum-URL</label>
                     <div class="col-9">
-                        <input type="url" class="form-control" id="imprint" name="imprint" value="{tenant.imprint}">
+                        <input type="url" class="form-control" id="imprint" name="imprint" value="{form.imprint ?: ''}">
                     </div>
                 </div>
                 <div class="mb-2 row">
                     <label for="logo" class="col-3 col-form-label">Logo-URL</label>
                     <div class="col-9">
-                        <input type="url" class="form-control" id="logo" name="logo" value="{tenant.logo}">
+                        <input type="url" class="form-control" id="logo" name="logo" value="{form.logo ?: ''}">
                     </div>
                 </div>
                 <div class="mb-2 row">
                     <label for="replyTo" class="col-3 col-form-label">Reply-To</label>
                     <div class="col-9">
-                        <input type="text" class="form-control" id="replyTo" name="replyTo" value="{tenant.replyTo}">
+                        <input type="text" class="form-control" id="replyTo" name="replyTo" value="{form.replyTo ?: ''}">
                     </div>
                 </div>
                 <div class="mb-2 row">
                     <label for="events" class="col-3 col-form-label">Events-URL</label>
                     <div class="col-9">
-                        <input type="url" class="form-control" id="events" name="events" value="{tenant.events}">
+                        <input type="url" class="form-control" id="events" name="events" value="{form.events ?: ''}">
+                    </div>
+                </div>
+                <div class="mb-2 row">
+                    <label for="css" class="col-3 col-form-label">Eigenes CSS</label>
+                    <div class="col-9">
+                        <textarea class="form-control font-monospace" id="css" name="css" rows="12"
+                                  spellcheck="false">{form.css ?: ''}</textarea>
+                        <small class="form-text text-muted">
+                            Optional. Wird nur auf den Teilnehmer-Seiten (Anmeldung, Abmeldung, Webinar)
+                            eingebunden, nicht hier im Admin-Bereich, und steht dort hinter Bootstrap &ndash;
+                            eigene Regeln gewinnen also. Gedacht, um die per <code>&lt;iframe&gt;</code>
+                            eingebundenen Seiten an die eigene Website anzupassen, z.B.
+                            {| <code>body { font-family: Georgia, serif; }</code> |}.
+                            Leer lassen heißt: unverändertes Standard-Layout.
+                        </small>
                     </div>
                 </div>
                 <div class="mb-3 mt-3">

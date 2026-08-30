@@ -1,0 +1,10 @@
+{!
+The JUG's optional stylesheet, maintained in the admin area. Deliberately the last element in
+<head> so it can override Bootstrap, and deliberately inline rather than a <link>: these pages
+run inside an iframe on someone else's website, where a second request would only add latency
+before the first paint.
+
+Pulled in through the {#styles} section -- by the participant pages only, never by the admin
+area. A broken stylesheet must not break the very form used to repair it.
+!}
+{#if inject:tenantStyle.present}<style>{inject:tenantStyle.css}</style>{/if}

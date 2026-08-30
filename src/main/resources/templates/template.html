@@ -7,6 +7,7 @@
     <title>{#insert title}iJUG Event Registration App{/}</title>
     <link rel="stylesheet" href="/webjars/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/webjars/bootstrap-icons/font/bootstrap-icons.css" />
+    {#insert styles}{/}
 </head>
 <body>
     {#insert body}No body!{/}
@@ -15,27 +16,27 @@
     {#insert scripts}{/}
     <script>
         {|
-        // Qute-Rohblock: das JS-Objektliteral unten sieht sonst wie ein Qute-Ausdruck aus.
-        // Meldet die Inhaltshoehe an die einbettende Seite, damit deren <iframe> mitwachsen
-        // kann. Die Gegenstelle ist optional - ohne Listener bleibt es bei der fest
-        // eingestellten Hoehe. Siehe docs/handbuch.adoc.
+        // Qute raw block: without it the JS object literal below reads as a Qute expression.
+        // Reports the content height to the embedding page so its <iframe> can grow along.
+        // The other end is optional -- without a listener the iframe simply keeps its
+        // configured height. See docs/handbuch.adoc.
         (function () {
-            if (window.parent === window) return; // nicht eingebettet
+            if (window.parent === window) return; // not embedded
 
             var last = -1;
-            // Der ResizeObserver liefert den ersten Wert von sich aus und meldet auch spaeter
-            // nachgeladene Bilder und Webfonts - ein zusaetzlicher load-Handler waere doppelt.
-            // Er feuert allerdings auch bei reinen Breitenaenderungen, daher der last-Vergleich.
+            // The ResizeObserver delivers the first value on its own and also catches images and
+            // web fonts that load later -- an extra load handler would be redundant. It fires on
+            // pure width changes as well, hence the comparison against last.
             new ResizeObserver(function () {
-                // Bewusst die Hoehe des <body> und nicht die des Dokuments: die Dokumenthoehe
-                // waechst auf mindestens die Viewport-Hoehe mit, wodurch das iframe nach einer
-                // Vergroesserung nie wieder schrumpfen koennte. Body-Margins spart Bootstrap
-                // (Reboot setzt margin:0), deshalb reicht die reine Box-Hoehe.
+                // Deliberately the height of <body> and not of the document: the document height
+                // grows to at least the viewport height, which would keep the iframe from ever
+                // shrinking again after it grew. Bootstrap's Reboot sets margin:0 on body, so the
+                // plain box height is enough.
                 var height = Math.ceil(document.body.getBoundingClientRect().height);
                 if (height === last) return;
                 last = height;
-                // Ziel-Origin ist unbekannt (beliebige JUG-Seite), die Herkunftspruefung macht
-                // deshalb der Empfaenger - siehe Snippet in docs/handbuch.adoc.
+                // The target origin is unknown (any JUG website), so the receiver is the one that
+                // checks where the message came from -- see the snippet in docs/handbuch.adoc.
                 window.parent.postMessage({type: 'ijug-registration:height', height: height}, '*');
             }).observe(document.body);
         })();
